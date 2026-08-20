@@ -1,3 +1,9 @@
-from ._selection_sort import selection_sort
+from ._sort import (
+    available_sorting_algorithms,
+    sort,
+)
 
-__all__ = ["selection_sort"]
+__all__ = [
+    "available_sorting_algorithms",
+    "sort",
+]

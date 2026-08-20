@@ -1,17 +1,34 @@
 import numpy as np
 import pytest
 
-from tca.algorithms.sorting import selection_sort
+from tca.algorithms.sorting import (
+    available_sorting_algorithms,
+    sort,
+)
+
+METHODS = available_sorting_algorithms()
 
 
-@pytest.mark.parametrize("backend", ["python", "cpp"])
-def test_selection_sort_public_api(backend):
+def test_sorting_registry_is_not_empty():
+    assert METHODS
+
+
+@pytest.mark.parametrize("method", METHODS)
+@pytest.mark.parametrize(
+    "backend",
+    ["python", "cpp"],
+)
+def test_sort_public_api(method, backend):
     values = np.array(
         [5, 2, 4, 8, 4, 2, 1],
         dtype=np.float64,
     )
 
-    result = selection_sort(values, backend=backend)
+    result = sort(
+        values,
+        method=method,
+        backend=backend,
+    )
 
     assert result is None
 
@@ -24,8 +41,28 @@ def test_selection_sort_public_api(backend):
     )
 
 
-def test_selection_sort_rejects_unknown_backend():
-    values = np.array([3, 2, 1], dtype=np.float64)
+def test_sort_rejects_unknown_method():
+    values = np.array(
+        [3, 2, 1],
+        dtype=np.float64,
+    )
 
     with pytest.raises(ValueError):
-        selection_sort(values, backend="cuda")
+        sort(
+            values,
+            method="does_not_exist",
+        )
+
+
+def test_sort_rejects_unknown_backend():
+    values = np.array(
+        [3, 2, 1],
+        dtype=np.float64,
+    )
+
+    with pytest.raises(ValueError):
+        sort(
+            values,
+            method=METHODS[0],
+            backend="cuda",
+        )
