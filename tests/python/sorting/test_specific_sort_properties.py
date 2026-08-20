@@ -2,6 +2,7 @@ import pytest
 
 from tca.core.instrumentation import Metrics
 from tca.reference.sorting.insertion_sort import insertion_sort
+from tca.reference.sorting.merge_sort import merge_sort
 from tca.reference.sorting.selection_sort import selection_sort
 
 
@@ -88,3 +89,51 @@ def test_insertion_sort_worst_case(size):
     assert metrics.comparisons == expected_comparisons
     assert metrics.writes == expected_writes
     assert metrics.swaps == 0
+
+
+@pytest.mark.parametrize(
+    "size",
+    [1, 2, 4, 8, 16, 32],
+)
+def test_merge_sort_write_count_for_power_of_two(size):
+    values = list(range(size, 0, -1))
+    metrics = Metrics()
+
+    merge_sort(
+        values,
+        metrics=metrics,
+    )
+
+    levels = size.bit_length() - 1
+    expected_writes = 2 * size * levels
+
+    assert metrics.writes == expected_writes
+    assert metrics.swaps == 0
+
+
+def test_merge_sort_is_stable():
+    class Item:
+        def __init__(self, key, label):
+            self.key = key
+            self.label = label
+
+        def __lt__(self, other):
+            return self.key < other.key
+
+    values = [
+        Item(2, "a"),
+        Item(1, "b"),
+        Item(2, "c"),
+        Item(1, "d"),
+        Item(2, "e"),
+    ]
+
+    merge_sort(values)
+
+    assert [(item.key, item.label) for item in values] == [
+        (1, "b"),
+        (1, "d"),
+        (2, "a"),
+        (2, "c"),
+        (2, "e"),
+    ]
