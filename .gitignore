@@ -1,0 +1,36 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Tool caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# CMake / native build
+build/
+dist/
+_skbuild/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+
+# Native binaries
+*.pyd
+*.so
+*.dll
+*.dylib
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

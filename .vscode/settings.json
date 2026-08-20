@@ -1,0 +1,11 @@
+{
+    "files.eol": "\n",
+
+    "cmake.cmakePath": "C:\\Program Files\\CMake\\bin\\cmake.exe",
+
+    "cmake.configureSettings": {
+        "Python_EXECUTABLE": "${workspaceFolder}\\.venv\\Scripts\\python.exe"
+    },
+
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+}

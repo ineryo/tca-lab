@@ -1,0 +1,67 @@
+[project]
+name = "tca"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Igor Nery", email = "igornery.o@gmail.com" }
+]
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "matplotlib>=3.11.1",
+    "numpy>=2.5.2",
+    "pandas>=3.0.5",
+    "psutil>=7.2.2",
+    "pyyaml>=6.0.3",
+]
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+build-dir = "build/{wheel_tag}"
+
+[tool.uv]
+link-mode = "copy"
+
+cache-keys = [
+    { file = "pyproject.toml" },
+    { file = "CMakeLists.txt" },
+    { file = "cpp/**/*.cpp" },
+    { file = "cpp/**/*.hpp" },
+    { file = "src/**/*.py" },
+]
+
+[build-system]
+requires = ["scikit-build-core>=0.10", "pybind11"]
+build-backend = "scikit_build_core.build"
+
+[dependency-groups]
+dev = [
+    "black>=26.5.1",
+    "ipykernel>=7.3.0",
+    "jupyterlab>=4.6.3",
+    "pre-commit>=4.6.2",
+    "pybind11>=3.1.0",
+    "pytest>=9.1.1",
+    "ruff>=0.16.3",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+    "UP",
+    "B",
+    "SIM",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

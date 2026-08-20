@@ -1,0 +1,22 @@
+# Normalize every detected text file and use LF in the working tree.
+* text=auto eol=lf
+
+# Explicit binary files: never perform EOL conversion.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+
+*.zip binary
+*.7z binary
+*.tar binary
+*.gz binary
+
+*.dll binary
+*.exe binary
+*.pyd binary
+*.so binary
+*.dylib binary
