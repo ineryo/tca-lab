@@ -191,10 +191,79 @@ message(STATUS "pybind11 CMake dir: ${pybind11_DIR}")
 # Native C++ library
 # =============================================================================
 
+# Discover sorting implementations from the *_sort.cpp naming convention.
+file(
+    GLOB
+    TCA_SORTING_SOURCES
+    CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/cpp/src/algorithms/sorting/*_sort.cpp"
+)
+
+list(
+    SORT
+    TCA_SORTING_SOURCES
+)
+
+# -------------------------------------------------------------------------
+# Generate the sorting catalog used by the C++ registry.
+# -------------------------------------------------------------------------
+
+set(
+    TCA_GENERATED_INCLUDE_DIR
+    "${CMAKE_CURRENT_BINARY_DIR}/generated"
+)
+
+set(
+    TCA_SORTING_CATALOG_DIR
+    "${TCA_GENERATED_INCLUDE_DIR}/tca/algorithms/sorting"
+)
+
+set(
+    TCA_SORTING_CATALOG
+    "${TCA_SORTING_CATALOG_DIR}/algorithms.def"
+)
+
+file(
+    MAKE_DIRECTORY
+    "${TCA_SORTING_CATALOG_DIR}"
+)
+
+file(
+    WRITE
+    "${TCA_SORTING_CATALOG}"
+    ""
+)
+
+foreach(
+    TCA_SORTING_SOURCE
+    IN LISTS TCA_SORTING_SOURCES
+)
+    get_filename_component(
+        TCA_SORTING_FUNCTION
+        "${TCA_SORTING_SOURCE}"
+        NAME_WE
+    )
+
+    string(
+        REGEX REPLACE
+        "_sort$"
+        ""
+        TCA_SORTING_METHOD
+        "${TCA_SORTING_FUNCTION}"
+    )
+
+    file(
+        APPEND
+        "${TCA_SORTING_CATALOG}"
+        "TCA_SORTING_ALGORITHM(${TCA_SORTING_METHOD}, ${TCA_SORTING_FUNCTION})\n"
+    )
+endforeach()
+
 set(
     TCA_CPP_SOURCES
     cpp/src/core.cpp
-    cpp/src/algorithms/sorting/selection_sort.cpp
+    cpp/src/algorithms/sorting/registry.cpp
+    ${TCA_SORTING_SOURCES}
 )
 
 add_library(
@@ -207,6 +276,9 @@ target_include_directories(
     tca_cpp
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/include
+
+    PRIVATE
+        ${TCA_GENERATED_INCLUDE_DIR}
 )
 
 target_compile_features(
