@@ -3,6 +3,7 @@ import pytest
 
 from tca import _core
 from tca.algorithms.sorting import selection_sort
+from tca.core.instrumentation import Metrics
 from tca.reference.sorting.selection_sort import (
     selection_sort as reference_selection_sort,
 )
@@ -62,3 +63,29 @@ def test_selection_sort_random_inputs(backend, size):
     selection_sort(values, backend=backend)
 
     np.testing.assert_array_equal(values, expected)
+
+
+def test_cpp_selection_sort_metrics():
+    values = np.array(
+        [3, 1, 2],
+        dtype=np.float64,
+    )
+    metrics = Metrics()
+
+    result = _core.selection_sort(
+        values,
+        metrics,
+    )
+
+    assert result is None
+
+    np.testing.assert_array_equal(
+        values,
+        np.array(
+            [1, 2, 3],
+            dtype=np.float64,
+        ),
+    )
+
+    assert metrics.comparisons == 3
+    assert metrics.swaps == 2
