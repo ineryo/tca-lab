@@ -10,6 +10,11 @@ class DirectProbe {
   public:
     bool lt(double left, double right) const noexcept { return left < right; }
 
+    void write(std::span<double> values, std::size_t index,
+               double value) const noexcept {
+        values[index] = value;
+    }
+
     void swap(std::span<double> values, std::size_t index_i,
               std::size_t index_j) const noexcept {
         if (index_i != index_j) {

@@ -1,3 +1,5 @@
+from dataclasses import fields
+
 import numpy as np
 import pytest
 
@@ -9,6 +11,14 @@ from tca.algorithms.sorting import (
 from tca.core.instrumentation import Metrics
 
 METHODS = available_sorting_algorithms()
+
+
+def test_python_cpp_metrics_match():
+    python_metrics = {field.name for field in fields(Metrics)}
+
+    cpp_metrics = set(_core.available_metrics())
+
+    assert python_metrics == cpp_metrics
 
 
 def test_python_cpp_registries_match():

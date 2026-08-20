@@ -1,0 +1,3 @@
+TCA_METRIC(comparisons)
+TCA_METRIC(swaps)
+TCA_METRIC(writes)

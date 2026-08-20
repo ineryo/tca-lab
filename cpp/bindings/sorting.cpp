@@ -26,6 +26,15 @@ std::span<double> array_view(Array& values) {
     };
 }
 
+void accumulate_metrics(py::object& metrics,
+                        const tca::instrumentation::Metrics& native_metrics) {
+    native_metrics.for_each_metric([&metrics](const char* name, std::size_t value) {
+        const auto previous = metrics.attr(name).cast<std::size_t>();
+
+        metrics.attr(name) = py::int_(previous + value);
+    });
+}
+
 void sort_array(Array values, const std::string& method, py::object metrics) {
     auto view = array_view(values);
 
@@ -39,14 +48,7 @@ void sort_array(Array values, const std::string& method, py::object metrics) {
 
     tca::algorithms::sort(view, method, native_metrics);
 
-    const auto previous_comparisons = metrics.attr("comparisons").cast<std::size_t>();
-
-    const auto previous_swaps = metrics.attr("swaps").cast<std::size_t>();
-
-    metrics.attr("comparisons") =
-        py::int_(previous_comparisons + native_metrics.comparisons);
-
-    metrics.attr("swaps") = py::int_(previous_swaps + native_metrics.swaps);
+    accumulate_metrics(metrics, native_metrics);
 }
 
 } // namespace
@@ -61,6 +63,17 @@ void bind_sorting(py::module_& m) {
         for (const auto method : tca::algorithms::available_sorting_algorithms()) {
             result.append(py::str(std::string(method)));
         }
+
+        return result;
+    });
+
+    m.def("available_metrics", []() {
+        py::list result;
+
+        const tca::instrumentation::Metrics metrics;
+
+        metrics.for_each_metric(
+            [&result](const char* name, std::size_t) { result.append(py::str(name)); });
 
         return result;
     });

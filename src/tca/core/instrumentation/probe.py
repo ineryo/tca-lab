@@ -9,6 +9,10 @@ class Probe:
         self.metrics.comparisons += 1
         return left < right
 
+    def write(self, values, index: int, value) -> None:
+        values[index] = value
+        self.metrics.writes += 1
+
     def swap(self, values, index_i: int, index_j: int) -> None:
         if index_i == index_j:
             return
@@ -19,3 +23,4 @@ class Probe:
         )
 
         self.metrics.swaps += 1
+        self.metrics.writes += 2

@@ -17,6 +17,11 @@ class Probe {
         return left < right;
     }
 
+    void write(std::span<double> values, std::size_t index, double value) noexcept {
+        values[index] = value;
+        ++metrics_.writes;
+    }
+
     void swap(std::span<double> values, std::size_t index_i,
               std::size_t index_j) noexcept {
         if (index_i == index_j) {
@@ -24,7 +29,9 @@ class Probe {
         }
 
         std::swap(values[index_i], values[index_j]);
+
         ++metrics_.swaps;
+        metrics_.writes += 2;
     }
 
   private:

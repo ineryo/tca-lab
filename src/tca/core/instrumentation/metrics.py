@@ -1,11 +1,16 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 
 
 @dataclass(slots=True)
 class Metrics:
     comparisons: int = 0
     swaps: int = 0
+    writes: int = 0
 
     def reset(self) -> None:
-        self.comparisons = 0
-        self.swaps = 0
+        for field in fields(self):
+            setattr(
+                self,
+                field.name,
+                0,
+            )
