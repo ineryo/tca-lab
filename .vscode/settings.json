@@ -2,6 +2,8 @@
     "files.eol": "\n",
 
     "cmake.cmakePath": "C:\\Program Files\\CMake\\bin\\cmake.exe",
+    "cmake.configureOnOpen": false,
+    "cmake.configureOnEdit": false,
 
     "cmake.configureSettings": {
         "Python_EXECUTABLE": "${workspaceFolder}\\.venv\\Scripts\\python.exe"

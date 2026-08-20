@@ -38,6 +38,7 @@ build-backend = "scikit_build_core.build"
 dev = [
     "black>=26.5.1",
     "ipykernel>=7.3.0",
+    "jupyter-console>=6.6.3",
     "jupyterlab>=4.6.3",
     "pre-commit>=4.6.2",
     "pybind11>=3.1.0",

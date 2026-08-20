@@ -194,6 +194,7 @@ message(STATUS "pybind11 CMake dir: ${pybind11_DIR}")
 set(
     TCA_CPP_SOURCES
     cpp/src/core.cpp
+    cpp/src/algorithms/sorting/selection_sort.cpp
 )
 
 add_library(
@@ -229,6 +230,7 @@ set_target_properties(
 set(
     TCA_BINDING_SOURCES
     cpp/bindings/module.cpp
+    cpp/bindings/sorting.cpp
 )
 
 pybind11_add_module(
