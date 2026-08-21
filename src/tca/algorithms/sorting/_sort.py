@@ -3,7 +3,7 @@ from typing import Literal
 import numpy as np
 
 from tca import _core
-from tca.core.instrumentation import Metrics
+from tca.core.instrumentation import Metrics, Trace
 from tca.reference.sorting.registry import (
     available_sorting_algorithms as _available_sorting_algorithms,
 )
@@ -22,6 +22,7 @@ def sort(
     method: str,
     backend: Backend = "python",
     metrics: Metrics | None = None,
+    trace: Trace | None = None,
 ) -> None:
     if not isinstance(values, np.ndarray):
         raise TypeError("values must be a NumPy array")
@@ -35,10 +36,14 @@ def sort(
         algorithm(
             values,
             metrics=metrics,
+            trace=trace,
         )
         return
 
     if backend == "cpp":
+        if trace is not None:
+            raise ValueError("trace is only supported by the Python backend")
+
         if values.dtype != np.float64:
             raise TypeError("the C++ backend requires " "dtype=np.float64")
 

@@ -16,6 +16,44 @@ std::uint64_t digit_at(std::uint64_t value, std::uint64_t exponent) {
     return (value / exponent) % 10; // digito(v, exp)
 }
 
+std::vector<std::int64_t> normalize_keys(std::vector<std::int64_t> keys, int digits) {
+    int removable_digits = 0;
+
+    while (removable_digits < digits) {
+        bool all_divisible_by_ten = true;
+
+        for (const auto key : keys) {
+            if (key != 0 && key % 10 != 0) {
+                all_divisible_by_ten = false;
+                break;
+            }
+        }
+
+        if (!all_divisible_by_ten) {
+            break;
+        }
+
+        for (auto& key : keys) {
+            key /= 10;
+        }
+
+        ++removable_digits;
+    }
+
+    return keys;
+}
+
+int digit_count(std::uint64_t value) {
+    int count = 0;
+
+    while (value > 0) {
+        value /= 10;
+        ++count;
+    }
+
+    return count;
+}
+
 template <typename ProbeType>
 std::vector<std::size_t> counting_sort_by_digit(const std::vector<std::size_t>& indices,
                                                 const std::vector<std::uint64_t>& keys,
@@ -65,12 +103,15 @@ void radix_sort_impl(std::span<double> values, ProbeType& probe, int digits) {
         return;
     }
 
-    std::vector<std::int64_t> keys(values.size());
+    std::vector<std::int64_t> raw_keys(values.size());
 
     for (std::size_t index_i = 0; index_i < values.size(); ++index_i) {
-        keys[index_i] = tca::decimal_key(values[index_i],
-                                         digits); // k_i = trunc(x_i * 10^digits)
+        raw_keys[index_i] = tca::decimal_key(values[index_i],
+                                             digits); // k_i = trunc(x_i * 10^digits)
     }
+
+    const auto keys =
+        normalize_keys(raw_keys, digits); // remove zeros comuns da quantizacao
 
     const auto minimum_key =
         *std::min_element(keys.begin(), keys.end()); // k_min = min(k)
@@ -91,6 +132,9 @@ void radix_sort_impl(std::span<double> values, ProbeType& probe, int digits) {
     const auto maximum_key = *std::max_element(shifted_keys.begin(),
                                                shifted_keys.end()); // max = max(y)
 
+    const int effective_digits =
+        digit_count(maximum_key); // numero efetivo de digitos LSD
+
     std::vector<std::size_t> indices(values.size());
 
     for (std::size_t index_i = 0; index_i < indices.size(); ++index_i) {
@@ -99,13 +143,10 @@ void radix_sort_impl(std::span<double> values, ProbeType& probe, int digits) {
 
     std::uint64_t exponent = 1; // exp = 1
 
-    while (maximum_key / exponent > 0) { // enquanto max / exp > 0 {passadas LSD}
+    for (int pass = 0; pass < effective_digits;
+         ++pass) { // para cada digito efetivo {passadas LSD}
         indices = counting_sort_by_digit(indices, shifted_keys, exponent, probe);
         // counting(idx, exp)
-
-        if (exponent > maximum_key / 10) { // se não há próxima casa decimal
-            break;
-        }
 
         exponent *= 10; // exp = 10 * exp
     }

@@ -1,6 +1,6 @@
 import pytest
 
-from tca.core.instrumentation import Metrics
+from tca.core.instrumentation import Metrics, Trace
 from tca.reference.sorting.insertion_sort import insertion_sort
 from tca.reference.sorting.merge_sort import merge_sort
 from tca.reference.sorting.quick_sort import quick_sort
@@ -53,6 +53,50 @@ def test_selection_sort_comparison_count(size):
     assert metrics.comparisons == expected
 
 
+def test_selection_sort_trace():
+    values = [3, 1, 2]
+    metrics = Metrics()
+    trace = Trace()
+
+    selection_sort(
+        values,
+        metrics=metrics,
+        trace=trace,
+    )
+
+    assert values == [1, 2, 3]
+    assert metrics.comparisons == 3
+    assert metrics.swaps == 2
+    assert metrics.writes == 4
+
+    operation_events = [event for event in trace if event.kind in {"compare", "swap"}]
+
+    assert [event.kind for event in operation_events] == [
+        "compare",
+        "compare",
+        "swap",
+        "compare",
+        "swap",
+    ]
+
+    compare_events = [event for event in trace if event.kind == "compare"]
+
+    assert [event.indices for event in compare_events] == [
+        (1, 0),
+        (2, 1),
+        (2, 1),
+    ]
+
+    minimum_events = [event for event in trace if event.kind == "select_minimum"]
+
+    assert [event.indices for event in minimum_events] == [
+        (0,),
+        (1,),
+        (1,),
+        (2,),
+    ]
+
+
 @pytest.mark.parametrize(
     "size",
     [1, 2, 5, 10, 100],
@@ -91,6 +135,43 @@ def test_insertion_sort_worst_case(size):
     assert metrics.comparisons == expected_comparisons
     assert metrics.writes == expected_writes
     assert metrics.swaps == 0
+
+
+def test_insertion_sort_trace():
+    values = [3, 1, 2]
+    metrics = Metrics()
+    trace = Trace()
+
+    insertion_sort(
+        values,
+        metrics=metrics,
+        trace=trace,
+    )
+
+    assert values == [1, 2, 3]
+    assert metrics.comparisons == 3
+    assert metrics.swaps == 0
+    assert metrics.writes == 4
+
+    key_events = [event for event in trace if event.kind == "select_key"]
+
+    assert [event.indices for event in key_events] == [
+        (1,),
+        (2,),
+    ]
+
+    assert [event.values for event in key_events] == [
+        (1,),
+        (2,),
+    ]
+
+    compare_events = [event for event in trace if event.kind == "compare"]
+
+    assert [event.indices for event in compare_events] == [
+        (1, 0),
+        (2, 1),
+        (2, 0),
+    ]
 
 
 @pytest.mark.parametrize(
@@ -139,6 +220,44 @@ def test_merge_sort_is_stable():
         (2, "c"),
         (2, "e"),
     ]
+
+
+def test_merge_sort_trace():
+    values = [4, 3, 2, 1]
+    metrics = Metrics()
+    trace = Trace()
+
+    merge_sort(
+        values,
+        metrics=metrics,
+        trace=trace,
+    )
+
+    assert values == [1, 2, 3, 4]
+    assert metrics.comparisons == 4
+    assert metrics.swaps == 0
+    assert metrics.writes == 16
+
+    merge_events = [event for event in trace if event.kind == "merge_range"]
+
+    assert [event.indices for event in merge_events] == [
+        (0, 1, 2),
+        (2, 3, 4),
+        (0, 2, 4),
+    ]
+
+    write_events = [event for event in trace if event.kind == "write"]
+
+    buffer_writes = [
+        event for event in write_events if event.data.get("target") == "buffer"
+    ]
+
+    value_writes = [
+        event for event in write_events if event.data.get("target") == "values"
+    ]
+
+    assert len(buffer_writes) == 8
+    assert len(value_writes) == 8
 
 
 @pytest.mark.parametrize(
@@ -192,6 +311,54 @@ def test_quick_sort_bounded_avoids_linear_recursion_depth():
     assert values == list(range(2000))
 
 
+def test_quick_sort_trace():
+    values = [3, 1, 2]
+    metrics = Metrics()
+    trace = Trace()
+
+    quick_sort(
+        values,
+        metrics=metrics,
+        trace=trace,
+        pivot="first",
+        recursion="bounded",
+    )
+
+    assert values == [1, 2, 3]
+
+    pivot_events = [event for event in trace if event.kind == "choose_pivot"]
+
+    partition_events = [event for event in trace if event.kind == "partition"]
+
+    compare_events = [event for event in trace if event.kind == "compare"]
+
+    swap_events = [event for event in trace if event.kind == "swap"]
+
+    assert [event.indices for event in pivot_events] == [
+        (0,),
+        (0,),
+    ]
+
+    assert [event.indices for event in partition_events] == [
+        (0, 2, 2),
+        (0, 1, 1),
+    ]
+
+    assert metrics.comparisons == len(compare_events)
+    assert metrics.swaps == len(swap_events)
+    assert metrics.writes == 2 * len(swap_events)
+
+    assert [event.values for event in pivot_events] == [
+        (3,),
+        (2,),
+    ]
+
+    assert [event.data["strategy"] for event in pivot_events] == [
+        "first",
+        "first",
+    ]
+
+
 def test_radix_sort_metrics():
     values = [5.1342, 5.1346, 5.1344, 3.2, 5.1]
     metrics = Metrics()
@@ -202,3 +369,56 @@ def test_radix_sort_metrics():
     assert metrics.comparisons == 0
     assert metrics.swaps == 0
     assert metrics.writes == 30
+
+
+def test_radix_sort_trace():
+    values = [5.1342, 5.1346, 5.1344, 3.2, 5.1]
+    metrics = Metrics()
+    trace = Trace()
+
+    radix_sort(
+        values,
+        metrics=metrics,
+        trace=trace,
+        digits=3,
+    )
+
+    assert values == [3.2, 5.1, 5.1342, 5.1346, 5.1344]
+    assert metrics.comparisons == 0
+    assert metrics.swaps == 0
+    assert metrics.writes == 30
+
+    pass_events = [event for event in trace if event.kind == "radix_pass"]
+
+    assert [event.data["exponent"] for event in pass_events] == [
+        1,
+        10,
+        100,
+        1000,
+    ]
+
+    assert pass_events[0].data["order"] == (
+        3,
+        4,
+        0,
+        1,
+        2,
+    )
+
+    assert pass_events[-1].values == (
+        3.2,
+        5.1,
+        5.1342,
+        5.1346,
+        5.1344,
+    )
+
+    write_events = [event for event in trace if event.kind == "write"]
+
+    assert sum(event.data.get("target") == "indices" for event in write_events) == 20
+
+    assert (
+        sum(event.data.get("target") == "ordered_values" for event in write_events) == 5
+    )
+
+    assert sum(event.data.get("target") == "values" for event in write_events) == 5

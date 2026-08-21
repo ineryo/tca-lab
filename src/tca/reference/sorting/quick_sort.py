@@ -1,10 +1,11 @@
-from tca.core.instrumentation import DirectProbe, Metrics, Probe
+from tca.core.instrumentation import Metrics, Trace, make_probe
 from tca.core.prng import PRNG
 
 
 def quick_sort(
     values,
     metrics: Metrics | None = None,
+    trace: Trace | None = None,
     *,
     pivot: str = "first",
     recursion: str = "bounded",
@@ -16,7 +17,7 @@ def quick_sort(
     if recursion not in {"classic", "bounded"}:
         raise ValueError(f"unknown recursion strategy {recursion!r}")
 
-    probe = DirectProbe() if metrics is None else Probe(metrics)
+    probe = make_probe(metrics, trace)
     prng = PRNG(seed)
 
     _quick_sort(values, 0, len(values) - 1, probe, pivot, recursion, prng)
@@ -46,6 +47,16 @@ def _partition(
     values, index_r: int, index_s: int, probe, pivot: str, prng: PRNG
 ) -> int:
     index_pivot = _choose_pivot(index_r, index_s, pivot, prng)
+
+    probe.event(
+        "choose_pivot",
+        indices=(index_pivot,),
+        values=(values[index_pivot],),
+        start=index_r,
+        end=index_s,
+        strategy=pivot,
+    )
+
     probe.swap(values, index_r, index_pivot)  # move o pivô para x_r
 
     value_pivot = values[index_r]  # v = x_r
@@ -56,12 +67,22 @@ def _partition(
         index_i += 1  # i = i+1
 
         # até x_i >= v
-        while index_i <= index_s and probe.lt(values[index_i], value_pivot):
+        while index_i <= index_s and probe.lt(
+            values[index_i],
+            value_pivot,
+            indices=(index_i, index_r),
+            roles=("current", "pivot"),
+        ):
             index_i += 1  # i = i+1
 
         index_j -= 1  # j = j-1
 
-        while probe.lt(value_pivot, values[index_j]):  # até x_j <= v
+        while probe.lt(
+            value_pivot,
+            values[index_j],
+            indices=(index_r, index_j),
+            roles=("pivot", "current"),
+        ):  # até x_j <= v
             index_j -= 1  # j = j-1
 
         if index_j <= index_i:  # até j <= i
@@ -70,6 +91,12 @@ def _partition(
         probe.swap(values, index_i, index_j)  # troque x_i com x_j
 
     probe.swap(values, index_r, index_j)  # troque x_r com x_j
+
+    probe.event(
+        "partition",
+        indices=(index_r, index_j, index_s),
+        values=(value_pivot,),
+    )  # partition.indices = (start, pivot, end)
 
     return index_j
 

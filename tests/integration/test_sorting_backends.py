@@ -123,3 +123,43 @@ def test_sort_metrics_python_cpp_equivalence(
     )
 
     assert python_metrics == cpp_metrics
+
+
+@pytest.mark.parametrize(
+    "values",
+    [
+        [12.0, 15.0, 18.0, 92.0],
+        [12.0, 15.0, 18.3, 92.14],
+        [-92.0, 12.0],
+        [120.0, 150.0, 910.0],
+    ],
+)
+def test_radix_effective_digits_python_cpp_metrics_parity(values):
+    values_python = np.array(values, dtype=np.float64)
+    values_cpp = values_python.copy()
+
+    metrics_python = Metrics()
+    metrics_cpp = Metrics()
+
+    sort(
+        values_python,
+        method="radix",
+        backend="python",
+        metrics=metrics_python,
+    )
+
+    sort(
+        values_cpp,
+        method="radix",
+        backend="cpp",
+        metrics=metrics_cpp,
+    )
+
+    np.testing.assert_array_equal(
+        values_python,
+        values_cpp,
+    )
+
+    assert metrics_python.comparisons == metrics_cpp.comparisons
+    assert metrics_python.swaps == metrics_cpp.swaps
+    assert metrics_python.writes == metrics_cpp.writes
