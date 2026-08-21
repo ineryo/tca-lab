@@ -4,6 +4,7 @@ import tca.experiments.measurements as measurements
 from tca.algorithms.sorting import sort
 from tca.core.instrumentation import Metrics
 from tca.experiments import (
+    MEASUREMENT_MODES,
     SortingCase,
     generate_sorting_data,
     measure_sorting_case,
@@ -151,3 +152,57 @@ def test_measure_sorting_case_rejects_unknown_mode():
             algorithm="merge",
             mode="unknown",
         )
+
+
+def test_measurement_modes_include_memory():
+    assert MEASUREMENT_MODES == (
+        "time",
+        "metrics",
+        "memory",
+    )
+
+
+@pytest.mark.parametrize(
+    "backend",
+    ["python", "cpp"],
+)
+def test_measure_memory_populates_only_peak_memory_bytes(
+    backend,
+):
+    result = measure_sorting_case(
+        make_case(),
+        algorithm="merge",
+        backend=backend,
+        mode="memory",
+    )
+
+    assert result.peak_memory_bytes is not None
+    assert result.peak_memory_bytes >= 0
+
+    assert result.elapsed_seconds is None
+    assert result.comparisons is None
+    assert result.swaps is None
+    assert result.writes is None
+
+
+@pytest.mark.parametrize(
+    "backend",
+    ["python", "cpp"],
+)
+def test_measure_memory_preserves_result_metadata(
+    backend,
+):
+    case = make_case()
+
+    result = measure_sorting_case(
+        case,
+        algorithm="merge",
+        backend=backend,
+        mode="memory",
+    )
+
+    assert result.case == case
+    assert result.algorithm == "merge"
+    assert result.backend == backend
+    assert result.mode == "memory"
+    assert result.status == "ok"
