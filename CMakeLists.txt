@@ -303,6 +303,7 @@ set(
     TCA_BINDING_SOURCES
     cpp/bindings/module.cpp
     cpp/bindings/prng.cpp
+    cpp/bindings/quantization.cpp
     cpp/bindings/sorting.cpp
 )
 

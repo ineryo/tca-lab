@@ -4,6 +4,7 @@ from tca.core.instrumentation import Metrics
 from tca.reference.sorting.insertion_sort import insertion_sort
 from tca.reference.sorting.merge_sort import merge_sort
 from tca.reference.sorting.quick_sort import quick_sort
+from tca.reference.sorting.radix_sort import radix_sort
 from tca.reference.sorting.selection_sort import selection_sort
 
 
@@ -189,3 +190,15 @@ def test_quick_sort_bounded_avoids_linear_recursion_depth():
     quick_sort(values, pivot="first", recursion="bounded")
 
     assert values == list(range(2000))
+
+
+def test_radix_sort_metrics():
+    values = [5.1342, 5.1346, 5.1344, 3.2, 5.1]
+    metrics = Metrics()
+
+    radix_sort(values, metrics=metrics, digits=3)
+
+    assert values == [3.2, 5.1, 5.1342, 5.1346, 5.1344]
+    assert metrics.comparisons == 0
+    assert metrics.swaps == 0
+    assert metrics.writes == 30

@@ -8,6 +8,7 @@
 #include <string>
 
 #include "tca/algorithms/sorting/quick_sort.hpp"
+#include "tca/algorithms/sorting/radix_sort.hpp"
 #include "tca/algorithms/sorting/registry.hpp"
 #include "tca/core/instrumentation/metrics.hpp"
 
@@ -65,6 +66,22 @@ tca::algorithms::QuickRecursion parse_quick_recursion(const std::string& recursi
     throw std::invalid_argument("unknown recursion strategy: " + recursion);
 }
 
+void sort_array(Array values, const std::string& method, py::object metrics) {
+    auto view = array_view(values);
+
+    if (metrics.is_none()) {
+        tca::algorithms::sort(view, method);
+
+        return;
+    }
+
+    tca::instrumentation::Metrics native_metrics;
+
+    tca::algorithms::sort(view, method, native_metrics);
+
+    accumulate_metrics(metrics, native_metrics);
+}
+
 void quick_sort_array(Array values, const std::string& pivot,
                       const std::string& recursion, std::uint64_t seed,
                       py::object metrics) {
@@ -89,18 +106,18 @@ void quick_sort_array(Array values, const std::string& pivot,
     accumulate_metrics(metrics, native_metrics);
 }
 
-void sort_array(Array values, const std::string& method, py::object metrics) {
+void radix_sort_array(Array values, int digits, py::object metrics) {
     auto view = array_view(values);
 
     if (metrics.is_none()) {
-        tca::algorithms::sort(view, method);
+        tca::algorithms::radix_sort(view, digits);
 
         return;
     }
 
     tca::instrumentation::Metrics native_metrics;
 
-    tca::algorithms::sort(view, method, native_metrics);
+    tca::algorithms::radix_sort(view, native_metrics, digits);
 
     accumulate_metrics(metrics, native_metrics);
 }
@@ -114,6 +131,9 @@ void bind_sorting(py::module_& m) {
     m.def("quick_sort", &quick_sort_array, py::arg("values"),
           py::arg("pivot") = "first", py::arg("recursion") = "bounded",
           py::arg("seed") = 0, py::arg("metrics") = py::none());
+
+    m.def("radix_sort", &radix_sort_array, py::arg("values"), py::arg("digits") = 3,
+          py::arg("metrics") = py::none());
 
     m.def("available_sorting_algorithms", []() {
         py::list result;

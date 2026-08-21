@@ -10,8 +10,9 @@ class DirectProbe {
   public:
     bool lt(double left, double right) const noexcept { return left < right; }
 
-    void write(std::span<double> values, std::size_t index,
-               double value) const noexcept {
+    template <typename ValueType>
+    void write(std::span<ValueType> values, std::size_t index,
+               const ValueType& value) const noexcept {
         values[index] = value;
     }
 

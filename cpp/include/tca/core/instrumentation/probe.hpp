@@ -17,7 +17,9 @@ class Probe {
         return left < right;
     }
 
-    void write(std::span<double> values, std::size_t index, double value) noexcept {
+    template <typename ValueType>
+    void write(std::span<ValueType> values, std::size_t index,
+               const ValueType& value) noexcept {
         values[index] = value;
         ++metrics_.writes;
     }
