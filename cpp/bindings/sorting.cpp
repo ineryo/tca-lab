@@ -2,10 +2,12 @@
 #include <pybind11/pybind11.h>
 
 #include <cstddef>
+#include <cstdint>
 #include <span>
 #include <stdexcept>
 #include <string>
 
+#include "tca/algorithms/sorting/quick_sort.hpp"
 #include "tca/algorithms/sorting/registry.hpp"
 #include "tca/core/instrumentation/metrics.hpp"
 
@@ -35,6 +37,58 @@ void accumulate_metrics(py::object& metrics,
     });
 }
 
+tca::algorithms::QuickPivot parse_quick_pivot(const std::string& pivot) {
+    if (pivot == "first") {
+        return tca::algorithms::QuickPivot::First;
+    }
+
+    if (pivot == "quarter") {
+        return tca::algorithms::QuickPivot::Quarter;
+    }
+
+    if (pivot == "random") {
+        return tca::algorithms::QuickPivot::Random;
+    }
+
+    throw std::invalid_argument("unknown pivot strategy: " + pivot);
+}
+
+tca::algorithms::QuickRecursion parse_quick_recursion(const std::string& recursion) {
+    if (recursion == "classic") {
+        return tca::algorithms::QuickRecursion::Classic;
+    }
+
+    if (recursion == "bounded") {
+        return tca::algorithms::QuickRecursion::Bounded;
+    }
+
+    throw std::invalid_argument("unknown recursion strategy: " + recursion);
+}
+
+void quick_sort_array(Array values, const std::string& pivot,
+                      const std::string& recursion, std::uint64_t seed,
+                      py::object metrics) {
+    auto view = array_view(values);
+
+    const tca::algorithms::QuickSortOptions options{
+        parse_quick_pivot(pivot),
+        parse_quick_recursion(recursion),
+        seed,
+    };
+
+    if (metrics.is_none()) {
+        tca::algorithms::quick_sort(view, options);
+
+        return;
+    }
+
+    tca::instrumentation::Metrics native_metrics;
+
+    tca::algorithms::quick_sort(view, native_metrics, options);
+
+    accumulate_metrics(metrics, native_metrics);
+}
+
 void sort_array(Array values, const std::string& method, py::object metrics) {
     auto view = array_view(values);
 
@@ -56,6 +110,10 @@ void sort_array(Array values, const std::string& method, py::object metrics) {
 void bind_sorting(py::module_& m) {
     m.def("sort", &sort_array, py::arg("values"), py::arg("method"),
           py::arg("metrics") = py::none());
+
+    m.def("quick_sort", &quick_sort_array, py::arg("values"),
+          py::arg("pivot") = "first", py::arg("recursion") = "bounded",
+          py::arg("seed") = 0, py::arg("metrics") = py::none());
 
     m.def("available_sorting_algorithms", []() {
         py::list result;

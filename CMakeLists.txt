@@ -302,6 +302,7 @@ set_target_properties(
 set(
     TCA_BINDING_SOURCES
     cpp/bindings/module.cpp
+    cpp/bindings/prng.cpp
     cpp/bindings/sorting.cpp
 )
 

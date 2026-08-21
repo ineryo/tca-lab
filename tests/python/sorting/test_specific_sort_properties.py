@@ -3,6 +3,7 @@ import pytest
 from tca.core.instrumentation import Metrics
 from tca.reference.sorting.insertion_sort import insertion_sort
 from tca.reference.sorting.merge_sort import merge_sort
+from tca.reference.sorting.quick_sort import quick_sort
 from tca.reference.sorting.selection_sort import selection_sort
 
 
@@ -137,3 +138,54 @@ def test_merge_sort_is_stable():
         (2, "c"),
         (2, "e"),
     ]
+
+
+@pytest.mark.parametrize(
+    "size",
+    [1, 2, 5, 10, 100],
+)
+def test_quick_sort_sorted_input(size):
+    values = list(range(size))
+    metrics = Metrics()
+
+    quick_sort(values, metrics=metrics)
+
+    expected_comparisons = 0 if size < 2 else size * (size + 1) // 2 + size - 2
+
+    assert metrics.comparisons == expected_comparisons
+    assert metrics.swaps == 0
+    assert metrics.writes == 0
+
+
+@pytest.mark.parametrize(
+    "pivot",
+    ["first", "quarter", "random"],
+)
+@pytest.mark.parametrize(
+    "recursion",
+    ["classic", "bounded"],
+)
+def test_quick_sort_strategies(pivot, recursion):
+    values = [8, 3, 7, 4, 9, 2, 6, 5, 1]
+
+    quick_sort(values, pivot=pivot, recursion=recursion, seed=42)
+
+    assert values == [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+def test_quick_sort_rejects_invalid_pivot():
+    with pytest.raises(ValueError, match="unknown pivot strategy"):
+        quick_sort([], pivot="invalid")
+
+
+def test_quick_sort_rejects_invalid_recursion():
+    with pytest.raises(ValueError, match="unknown recursion strategy"):
+        quick_sort([], recursion="invalid")
+
+
+def test_quick_sort_bounded_avoids_linear_recursion_depth():
+    values = list(range(2000))
+
+    quick_sort(values, pivot="first", recursion="bounded")
+
+    assert values == list(range(2000))
