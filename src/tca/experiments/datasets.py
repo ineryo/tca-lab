@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 import numpy as np
 
 from tca.core.prng import MASK_64, PRNG
@@ -17,10 +19,68 @@ DEFAULT_LOW = -1_000_000.0
 DEFAULT_HIGH = 1_000_000.0
 DEFAULT_DIGITS = 3
 DEFAULT_NEARLY_SWAPS_FRACTION = 0.05
+DEFAULT_SIZES = tuple(10**k for k in range(7))
+DEFAULT_REPETITIONS = 5
+DEFAULT_BASE_SEED = 42
+
+
+@dataclass(frozen=True, slots=True)
+class SortingCase:
+    n: int
+    family: str
+    repetition: int
+    seed: int
 
 
 def available_data_families() -> tuple[str, ...]:
     return DATA_FAMILIES
+
+
+def sorting_case_catalog(
+    *,
+    sizes: tuple[int, ...] = DEFAULT_SIZES,
+    families: tuple[str, ...] = DATA_FAMILIES,
+    repetitions: int = DEFAULT_REPETITIONS,
+    base_seed: int = DEFAULT_BASE_SEED,
+) -> tuple[SortingCase, ...]:
+    if repetitions <= 0:
+        raise ValueError("repetitions must be greater than zero")
+
+    if not 0 <= base_seed <= MASK_64:
+        raise ValueError("base_seed must fit in uint64")
+
+    if any(n < 0 for n in sizes):
+        raise ValueError("sizes must be non-negative")
+
+    unknown_families = tuple(
+        family for family in families if family not in DATA_FAMILIES
+    )
+
+    if unknown_families:
+        raise ValueError(f"unknown data families: {unknown_families}")
+
+    n_seed_groups = len(sizes) * repetitions
+
+    if n_seed_groups and base_seed + n_seed_groups - 1 > MASK_64:
+        raise ValueError("generated seeds must fit in uint64")
+
+    cases: list[SortingCase] = []
+
+    for size_index, n in enumerate(sizes):
+        for repetition in range(repetitions):
+            seed = base_seed + size_index * repetitions + repetition
+
+            for family in families:
+                cases.append(
+                    SortingCase(
+                        n=n,
+                        family=family,
+                        repetition=repetition,
+                        seed=seed,
+                    )
+                )
+
+    return tuple(cases)
 
 
 def generate_sorting_data(

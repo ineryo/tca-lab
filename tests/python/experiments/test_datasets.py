@@ -4,8 +4,12 @@ import pytest
 from tca.core.prng import PRNG
 from tca.experiments import (
     DATA_FAMILIES,
+    DEFAULT_BASE_SEED,
+    DEFAULT_REPETITIONS,
+    DEFAULT_SIZES,
     available_data_families,
     generate_sorting_data,
+    sorting_case_catalog,
 )
 
 
@@ -316,3 +320,95 @@ def test_generate_sorting_data_rejects_invalid_digits(
             seed=42,
             digits=digits,
         )
+
+
+def test_sorting_case_catalog_has_expected_number_of_cases():
+    cases = sorting_case_catalog()
+
+    assert len(cases) == (len(DEFAULT_SIZES) * len(DATA_FAMILIES) * DEFAULT_REPETITIONS)
+
+
+def test_sorting_case_catalog_uses_expected_sizes():
+    cases = sorting_case_catalog()
+
+    assert {case.n for case in cases} == set(DEFAULT_SIZES)
+
+
+def test_sorting_case_catalog_uses_all_data_families():
+    cases = sorting_case_catalog()
+
+    assert {case.family for case in cases} == set(DATA_FAMILIES)
+
+
+def test_sorting_case_catalog_uses_expected_repetitions():
+    cases = sorting_case_catalog()
+
+    assert {case.repetition for case in cases} == set(range(DEFAULT_REPETITIONS))
+
+
+def test_sorting_case_catalog_shares_seed_across_families():
+    cases = sorting_case_catalog()
+
+    for n in DEFAULT_SIZES:
+        for repetition in range(DEFAULT_REPETITIONS):
+            seeds = {
+                case.seed
+                for case in cases
+                if case.n == n and case.repetition == repetition
+            }
+
+            assert len(seeds) == 1
+
+
+def test_sorting_case_catalog_uses_unique_seed_per_size_repetition():
+    cases = sorting_case_catalog()
+
+    seeds = {(case.n, case.repetition): case.seed for case in cases}
+
+    assert len(set(seeds.values())) == (len(DEFAULT_SIZES) * DEFAULT_REPETITIONS)
+
+
+def test_sorting_case_catalog_starts_at_default_base_seed():
+    cases = sorting_case_catalog()
+
+    assert cases[0].seed == DEFAULT_BASE_SEED
+
+
+def test_sorting_case_catalog_is_reproducible():
+    first = sorting_case_catalog()
+    second = sorting_case_catalog()
+
+    assert first == second
+
+
+def test_sorting_case_catalog_accepts_subset():
+    cases = sorting_case_catalog(
+        sizes=(10, 100),
+        families=("uniform_random", "sorted"),
+        repetitions=2,
+        base_seed=100,
+    )
+
+    assert len(cases) == 8
+    assert {case.seed for case in cases} == {
+        100,
+        101,
+        102,
+        103,
+    }
+
+
+def test_sorting_case_catalog_rejects_invalid_repetitions():
+    with pytest.raises(
+        ValueError,
+        match="repetitions must be greater than zero",
+    ):
+        sorting_case_catalog(repetitions=0)
+
+
+def test_sorting_case_catalog_rejects_unknown_family():
+    with pytest.raises(
+        ValueError,
+        match="unknown data families",
+    ):
+        sorting_case_catalog(families=("uniform_random", "unknown"))
