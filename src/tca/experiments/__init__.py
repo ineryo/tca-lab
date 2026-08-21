@@ -8,6 +8,10 @@ from .datasets import (
     generate_sorting_data,
     sorting_case_catalog,
 )
+from .measurements import (
+    MEASUREMENT_MODES,
+    measure_sorting_case,
+)
 from .results import (
     RESULT_STATUSES,
     SortingResult,
@@ -20,6 +24,7 @@ __all__ = [
     "DEFAULT_BASE_SEED",
     "DEFAULT_REPETITIONS",
     "DEFAULT_SIZES",
+    "MEASUREMENT_MODES",
     "RESULT_STATUSES",
     "SortingCase",
     "SortingResult",
@@ -27,5 +32,6 @@ __all__ = [
     "available_data_families",
     "generate_sorting_data",
     "load_sorting_results",
+    "measure_sorting_case",
     "sorting_case_catalog",
 ]
