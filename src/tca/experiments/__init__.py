@@ -18,6 +18,13 @@ from .results import (
     append_sorting_result,
     load_sorting_results,
 )
+from .runner import (
+    BACKENDS,
+    SortingTask,
+    run_sorting_task,
+    run_sorting_tasks,
+    sorting_task_catalog,
+)
 
 __all__ = [
     "DATA_FAMILIES",
@@ -34,4 +41,9 @@ __all__ = [
     "load_sorting_results",
     "measure_sorting_case",
     "sorting_case_catalog",
+    "BACKENDS",
+    "SortingTask",
+    "run_sorting_task",
+    "run_sorting_tasks",
+    "sorting_task_catalog",
 ]
