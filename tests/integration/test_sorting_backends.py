@@ -11,6 +11,7 @@ from tca.algorithms.sorting import (
 from tca.core.instrumentation import Metrics
 
 METHODS = available_sorting_algorithms()
+NATIVE_METHODS = tuple(_core.available_sorting_algorithms())
 
 
 def test_python_cpp_metrics_match():
@@ -24,12 +25,12 @@ def test_python_cpp_metrics_match():
 def test_python_cpp_registries_match():
     python_methods = set(METHODS)
 
-    cpp_methods = set(_core.available_sorting_algorithms())
+    cpp_methods = set(NATIVE_METHODS)
 
-    assert python_methods == cpp_methods
+    assert cpp_methods <= python_methods
 
 
-@pytest.mark.parametrize("method", METHODS)
+@pytest.mark.parametrize("method", NATIVE_METHODS)
 def test_cpp_sort(method):
     values = np.array(
         [5, 2, 4, 8, 4, 2, 1],
@@ -123,6 +124,58 @@ def test_sort_metrics_python_cpp_equivalence(
     )
 
     assert python_metrics == cpp_metrics
+
+
+@pytest.mark.parametrize("backend", ["python", "cpp"])
+@pytest.mark.parametrize(
+    ("profile", "pivot", "recursion"),
+    [
+        ("quick_classic", "first", "classic"),
+        ("quick_smarter", "random", "bounded"),
+    ],
+)
+def test_quick_profiles_use_the_expected_strategy(
+    backend,
+    profile,
+    pivot,
+    recursion,
+):
+    values = np.array(
+        [9, 1, 8, 2, 7, 3, 6, 4, 5],
+        dtype=np.float64,
+    )
+
+    profile_values = values.copy()
+    expected_values = values.copy()
+    profile_metrics = Metrics()
+    expected_metrics = Metrics()
+
+    sort(
+        profile_values,
+        method=profile,
+        backend=backend,
+        metrics=profile_metrics,
+    )
+
+    if backend == "python":
+        from tca.reference.sorting.quick_sort import quick_sort
+
+        quick_sort(
+            expected_values,
+            metrics=expected_metrics,
+            pivot=pivot,
+            recursion=recursion,
+        )
+    else:
+        _core.quick_sort(
+            expected_values,
+            pivot=pivot,
+            recursion=recursion,
+            metrics=expected_metrics,
+        )
+
+    np.testing.assert_array_equal(profile_values, expected_values)
+    assert profile_metrics == expected_metrics
 
 
 @pytest.mark.parametrize(

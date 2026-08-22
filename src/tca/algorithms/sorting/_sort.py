@@ -11,9 +11,20 @@ from tca.reference.sorting.registry import get_sorting_algorithm
 
 Backend = Literal["python", "cpp"]
 
+QUICK_PROFILES = {
+    "quick_classic": {
+        "pivot": "first",
+        "recursion": "classic",
+    },
+    "quick_smarter": {
+        "pivot": "random",
+        "recursion": "bounded",
+    },
+}
+
 
 def available_sorting_algorithms() -> tuple[str, ...]:
-    return _available_sorting_algorithms()
+    return (*_available_sorting_algorithms(), *QUICK_PROFILES)
 
 
 def sort(
@@ -30,9 +41,23 @@ def sort(
     if values.ndim != 1:
         raise ValueError("values must be one-dimensional")
 
-    algorithm = get_sorting_algorithm(method)
+    quick_profile = QUICK_PROFILES.get(method)
+
+    if quick_profile is None:
+        algorithm = get_sorting_algorithm(method)
+    else:
+        algorithm = get_sorting_algorithm("quick")
 
     if backend == "python":
+        if quick_profile is not None:
+            algorithm(
+                values,
+                metrics=metrics,
+                trace=trace,
+                **quick_profile,
+            )
+            return
+
         algorithm(
             values,
             metrics=metrics,
@@ -49,6 +74,14 @@ def sort(
 
         if not values.flags.c_contiguous:
             raise ValueError("the C++ backend requires " "a C-contiguous array")
+
+        if quick_profile is not None:
+            _core.quick_sort(
+                values,
+                metrics=metrics,
+                **quick_profile,
+            )
+            return
 
         _core.sort(
             values,
