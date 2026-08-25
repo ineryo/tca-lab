@@ -24,10 +24,14 @@ def test_python_cpp_metrics_match():
 
 def test_python_cpp_registries_match():
     python_methods = set(METHODS)
-
     cpp_methods = set(NATIVE_METHODS)
 
-    assert cpp_methods <= python_methods
+    assert cpp_methods - python_methods == {"radix_binary"}
+
+
+def test_radix_binary_is_cpp_only():
+    assert "radix_binary" in NATIVE_METHODS
+    assert "radix_binary" not in METHODS
 
 
 @pytest.mark.parametrize("method", NATIVE_METHODS)

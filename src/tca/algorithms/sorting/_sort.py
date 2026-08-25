@@ -11,6 +11,15 @@ from tca.reference.sorting.registry import get_sorting_algorithm
 
 Backend = Literal["python", "cpp"]
 
+MERGE_PROFILES = {
+    "merge_classic": {
+        "buffer": "local",
+    },
+    "merge_smarter": {
+        "buffer": "reused",
+    },
+}
+
 QUICK_PROFILES = {
     "quick_classic": {
         "pivot": "first",
@@ -24,7 +33,11 @@ QUICK_PROFILES = {
 
 
 def available_sorting_algorithms() -> tuple[str, ...]:
-    return (*_available_sorting_algorithms(), *QUICK_PROFILES)
+    return (
+        *_available_sorting_algorithms(),
+        *MERGE_PROFILES,
+        *QUICK_PROFILES,
+    )
 
 
 def sort(
@@ -41,14 +54,26 @@ def sort(
     if values.ndim != 1:
         raise ValueError("values must be one-dimensional")
 
+    merge_profile = MERGE_PROFILES.get(method)
     quick_profile = QUICK_PROFILES.get(method)
 
-    if quick_profile is None:
-        algorithm = get_sorting_algorithm(method)
-    else:
+    if merge_profile is not None:
+        algorithm = get_sorting_algorithm("merge")
+    elif quick_profile is not None:
         algorithm = get_sorting_algorithm("quick")
+    else:
+        algorithm = get_sorting_algorithm(method)
 
     if backend == "python":
+        if merge_profile is not None:
+            algorithm(
+                values,
+                metrics=metrics,
+                trace=trace,
+                **merge_profile,
+            )
+            return
+
         if quick_profile is not None:
             algorithm(
                 values,
@@ -70,10 +95,18 @@ def sort(
             raise ValueError("trace is only supported by the Python backend")
 
         if values.dtype != np.float64:
-            raise TypeError("the C++ backend requires " "dtype=np.float64")
+            raise TypeError("the C++ backend requires dtype=np.float64")
 
         if not values.flags.c_contiguous:
-            raise ValueError("the C++ backend requires " "a C-contiguous array")
+            raise ValueError("the C++ backend requires a C-contiguous array")
+
+        if merge_profile is not None:
+            _core.merge_sort(
+                values,
+                metrics=metrics,
+                **merge_profile,
+            )
+            return
 
         if quick_profile is not None:
             _core.quick_sort(
@@ -90,4 +123,4 @@ def sort(
         )
         return
 
-    raise ValueError(f"unknown backend {backend!r}; " "expected 'python' or 'cpp'")
+    raise ValueError(f"unknown backend {backend!r}; expected 'python' or 'cpp'")

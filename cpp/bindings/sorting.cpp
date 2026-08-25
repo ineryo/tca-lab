@@ -7,7 +7,9 @@
 #include <stdexcept>
 #include <string>
 
+#include "tca/algorithms/sorting/merge_sort.hpp"
 #include "tca/algorithms/sorting/quick_sort.hpp"
+#include "tca/algorithms/sorting/radix_binary_sort.hpp"
 #include "tca/algorithms/sorting/radix_sort.hpp"
 #include "tca/algorithms/sorting/registry.hpp"
 #include "tca/core/instrumentation/metrics.hpp"
@@ -36,6 +38,18 @@ void accumulate_metrics(py::object& metrics,
 
         metrics.attr(name) = py::int_(previous + value);
     });
+}
+
+tca::algorithms::MergeBuffer parse_merge_buffer(const std::string& buffer) {
+    if (buffer == "local") {
+        return tca::algorithms::MergeBuffer::Local;
+    }
+
+    if (buffer == "reused") {
+        return tca::algorithms::MergeBuffer::Reused;
+    }
+
+    throw std::invalid_argument("unknown merge buffer strategy: " + buffer);
 }
 
 tca::algorithms::QuickPivot parse_quick_pivot(const std::string& pivot) {
@@ -82,6 +96,26 @@ void sort_array(Array values, const std::string& method, py::object metrics) {
     accumulate_metrics(metrics, native_metrics);
 }
 
+void merge_sort_array(Array values, const std::string& buffer, py::object metrics) {
+    auto view = array_view(values);
+
+    const tca::algorithms::MergeSortOptions options{
+        parse_merge_buffer(buffer),
+    };
+
+    if (metrics.is_none()) {
+        tca::algorithms::merge_sort(view, options);
+
+        return;
+    }
+
+    tca::instrumentation::Metrics native_metrics;
+
+    tca::algorithms::merge_sort(view, native_metrics, options);
+
+    accumulate_metrics(metrics, native_metrics);
+}
+
 void quick_sort_array(Array values, const std::string& pivot,
                       const std::string& recursion, std::uint64_t seed,
                       py::object metrics) {
@@ -122,17 +156,39 @@ void radix_sort_array(Array values, int digits, py::object metrics) {
     accumulate_metrics(metrics, native_metrics);
 }
 
+void radix_binary_sort_array(Array values, py::object metrics) {
+    auto view = array_view(values);
+
+    if (metrics.is_none()) {
+        tca::algorithms::radix_binary_sort(view);
+
+        return;
+    }
+
+    tca::instrumentation::Metrics native_metrics;
+
+    tca::algorithms::radix_binary_sort(view, native_metrics);
+
+    accumulate_metrics(metrics, native_metrics);
+}
+
 } // namespace
 
 void bind_sorting(py::module_& m) {
     m.def("sort", &sort_array, py::arg("values"), py::arg("method"),
           py::arg("metrics") = py::none());
 
+    m.def("merge_sort", &merge_sort_array, py::arg("values"),
+          py::arg("buffer") = "reused", py::arg("metrics") = py::none());
+
     m.def("quick_sort", &quick_sort_array, py::arg("values"),
           py::arg("pivot") = "first", py::arg("recursion") = "bounded",
           py::arg("seed") = 0, py::arg("metrics") = py::none());
 
     m.def("radix_sort", &radix_sort_array, py::arg("values"), py::arg("digits") = 3,
+          py::arg("metrics") = py::none());
+
+    m.def("radix_binary_sort", &radix_binary_sort_array, py::arg("values"),
           py::arg("metrics") = py::none());
 
     m.def("available_sorting_algorithms", []() {
