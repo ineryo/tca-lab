@@ -166,17 +166,32 @@ def _run_sorting_task_with_timeout(
                 message=(f"timeout after " f"{timeout_seconds:g} seconds"),
             )
 
-        if not parent_connection.poll():
+        try:
+            has_payload = parent_connection.poll()
+        except OSError:
+            has_payload = False
+
+        if not has_payload:
             return SortingResult(
                 case=task.case,
                 algorithm=task.algorithm,
                 backend=task.backend,
                 mode=task.mode,
                 status="error",
-                message=("measurement worker exited " f"with code {process.exitcode}"),
+                message=f"measurement worker exited with code {process.exitcode}",
             )
 
-        status, payload = parent_connection.recv()
+        try:
+            status, payload = parent_connection.recv()
+        except (EOFError, OSError):
+            return SortingResult(
+                case=task.case,
+                algorithm=task.algorithm,
+                backend=task.backend,
+                mode=task.mode,
+                status="error",
+                message=f"measurement worker exited with code {process.exitcode}",
+            )
 
         if status == "ok":
             return payload
