@@ -849,7 +849,7 @@ wheels = [
 [[package]]
 name = "marp-artifact-updater"
 version = "0.0.0.dev0"
-source = { git = "https://github.com/ineryo/marp-artifact-updater.git#6a1d864763e5811d528de65e12f57d9afa3f9095" }
+source = { git = "https://github.com/ineryo/marp-artifact-updater.git#19259c8358a3b364e905fc86485d2fe8d788f644" }
 
 [[package]]
 name = "matplotlib"
