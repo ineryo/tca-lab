@@ -23,6 +23,7 @@ std::size_t choose_pivot(std::size_t index_r, std::size_t index_s,
     return index_r + static_cast<std::size_t>(prng.randbelow(size));
 }
 
+// snippet:start quick-sort-partition
 template <typename ProbeType>
 std::size_t partition(std::span<double> values, std::size_t index_r,
                       std::size_t index_s, ProbeType& probe,
@@ -59,7 +60,9 @@ std::size_t partition(std::span<double> values, std::size_t index_r,
 
     return index_j;
 }
+// snippet:end quick-sort-partition
 
+// snippet:start quick-sort
 template <typename ProbeType>
 void quick_sort_recursive(std::span<double> values, std::size_t index_r,
                           std::size_t index_s, ProbeType& probe,
@@ -104,6 +107,7 @@ void quick_sort_recursive(std::span<double> values, std::size_t index_r,
         }
     }
 }
+// snippet:end quick-sort
 
 template <typename ProbeType>
 void quick_sort_impl(std::span<double> values, ProbeType& probe,

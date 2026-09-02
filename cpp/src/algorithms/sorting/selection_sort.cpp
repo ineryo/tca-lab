@@ -7,6 +7,7 @@
 
 namespace {
 
+// snippet:start selection-sort
 template <typename ProbeType>
 void selection_sort_impl(std::span<double> values, ProbeType& probe) {
     for (std::size_t index_i = 0; index_i < values.size(); ++index_i) { // i=(0)..(n-1)
@@ -22,6 +23,7 @@ void selection_sort_impl(std::span<double> values, ProbeType& probe) {
         probe.swap(values, index_i, marker); // swap(x_i, x_m)
     }
 }
+// snippet:end selection-sort
 
 } // namespace
 

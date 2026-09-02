@@ -93,6 +93,7 @@ std::vector<std::size_t> counting_sort_by_digit(const std::vector<std::size_t>& 
     return output;
 }
 
+// snippet:start radix-sort
 template <typename ProbeType>
 void radix_sort_impl(std::span<double> values, ProbeType& probe, int digits) {
     if (digits < 0 || digits > tca::MAX_DECIMAL_DIGITS) {
@@ -167,6 +168,7 @@ void radix_sort_impl(std::span<double> values, ProbeType& probe, int digits) {
                     ordered_values[index_k]); // x_k = x'_k
     }
 }
+// snippet:end radix-sort
 
 } // namespace
 

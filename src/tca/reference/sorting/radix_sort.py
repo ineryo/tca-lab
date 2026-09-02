@@ -2,6 +2,7 @@ from tca.core.instrumentation import Metrics, Trace, make_probe
 from tca.core.quantization import MAX_DECIMAL_DIGITS, decimal_key
 
 
+# snippet:start radix-sort
 def radix_sort(
     values,
     metrics: Metrics | None = None,
@@ -69,6 +70,9 @@ def radix_sort(
 
     for index_k, value in enumerate(ordered_values):  # para k = 0..n-1
         probe.write(values, index_k, value, target="values")  # x_k = x'_k
+
+
+# snippet:end radix-sort
 
 
 def _counting_sort_by_digit(

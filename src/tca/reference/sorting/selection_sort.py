@@ -1,6 +1,7 @@
 from tca.core.instrumentation import Metrics, Trace, make_probe
 
 
+# snippet:start selection-sort
 def selection_sort(
     values,
     metrics: Metrics | None = None,
@@ -33,3 +34,6 @@ def selection_sort(
                 )  # novo mínimo m=j
 
         probe.swap(values, index_i, marker)  # swap(x_i, x_m)
+
+
+# snippet:end selection-sort

@@ -25,6 +25,7 @@ def merge_sort(
     )
 
 
+# snippet:start merge-sort
 def _merge_sort(
     values,
     buffer,
@@ -72,6 +73,10 @@ def _merge_sort(
     )  # {combinação}
 
 
+# snippet:end merge-sort
+
+
+# snippet:start merge-sort-combine
 def _merge(
     values,
     buffer,
@@ -123,7 +128,6 @@ def _merge(
                 target="values",
             )  # x_k = l_i
             index_l += 1  # i = i+1
-
         elif probe.lt(
             working_buffer[index_buffer_r],
             working_buffer[index_buffer_l],
@@ -146,3 +150,6 @@ def _merge(
                 target="values",
             )  # x_k = l_i
             index_l += 1  # i = i+1
+
+
+# snippet:end merge-sort-combine

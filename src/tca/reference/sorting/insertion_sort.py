@@ -1,6 +1,7 @@
 from tca.core.instrumentation import Metrics, Trace, make_probe
 
 
+# snippet:start insertion-sort
 def insertion_sort(
     values,
     metrics: Metrics | None = None,
@@ -28,3 +29,6 @@ def insertion_sort(
             index_j -= 1  # j = j - 1
 
         probe.write(values, index_j, value_marker)  # x_j = v
+
+
+# snippet:end insertion-sort

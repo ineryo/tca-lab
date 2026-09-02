@@ -43,6 +43,7 @@ def _choose_pivot(
     raise ValueError(f"unknown pivot strategy {pivot!r}")
 
 
+# snippet:start quick-sort-partition
 def _partition(
     values, index_r: int, index_s: int, probe, pivot: str, prng: PRNG
 ) -> int:
@@ -101,6 +102,10 @@ def _partition(
     return index_j
 
 
+# snippet:end quick-sort-partition
+
+
+# snippet:start quick-sort
 def _quick_sort(
     values,
     index_r: int,
@@ -128,3 +133,6 @@ def _quick_sort(
         else:
             _quick_sort(values, index_j + 1, index_s, probe, pivot, recursion, prng)
             index_s = index_j - 1  # continua iterativamente pela esquerda
+
+
+# snippet:end quick-sort

@@ -9,6 +9,7 @@
 
 namespace {
 
+// snippet:start merge-sort-combine
 template <typename ProbeType>
 void merge(std::span<double> values, std::span<double> buffer,
            std::size_t buffer_offset, std::size_t start, std::size_t middle,
@@ -52,7 +53,9 @@ void merge(std::span<double> values, std::span<double> buffer,
         }
     }
 }
+// snippet:end merge-sort-combine
 
+// snippet:start merge-sort
 template <typename ProbeType>
 void merge_sort_recursive(std::span<double> values, std::span<double> buffer,
                           std::size_t start, std::size_t end, ProbeType& probe,
@@ -84,6 +87,7 @@ void merge_sort_recursive(std::span<double> values, std::span<double> buffer,
               probe); // {combinação smarter}
     }
 }
+// snippet:end merge-sort
 
 template <typename ProbeType>
 void merge_sort_impl(std::span<double> values, ProbeType& probe,

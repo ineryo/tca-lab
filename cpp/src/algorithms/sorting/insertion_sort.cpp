@@ -7,6 +7,7 @@
 
 namespace {
 
+// snippet:start insertion-sort
 template <typename ProbeType>
 void insertion_sort_impl(std::span<double> values, ProbeType& probe) {
     for (std::size_t index_i = 1; index_i < values.size(); ++index_i) { // i=(1)..(n-1)
@@ -23,6 +24,7 @@ void insertion_sort_impl(std::span<double> values, ProbeType& probe) {
         probe.write(values, index_j, value_marker); // x_j = v
     }
 }
+// snippet:end insertion-sort
 
 } // namespace
 
