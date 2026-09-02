@@ -9,5 +9,11 @@
         "Python_EXECUTABLE": "${workspaceFolder}\\.venv\\Scripts\\python.exe"
     },
 
-    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+
+    "markdown.marp.html": "all",
+    "markdown.marp.themes": [
+        "./assignments/01-sorting/slides/tca.css"
+    ],
+    "markdown.marp.exportType": "html"
 }
