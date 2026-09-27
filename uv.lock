@@ -828,6 +828,11 @@ wheels = [
 ]
 
 [[package]]
+name = "markdown-artifact-updater"
+version = "0.0.0.dev0"
+source = { git = "https://github.com/ineryo/markdown-artifact-updater.git#eacb9a9c1bb347d87c920aeefa00e9c230f91e1d" }
+
+[[package]]
 name = "markupsafe"
 version = "3.0.3"
 source = { registry = "https://pypi.org/simple" }
@@ -1528,6 +1533,7 @@ dev = [
     { name = "ipykernel" },
     { name = "jupyter-console" },
     { name = "jupyterlab" },
+    { name = "markdown-artifact-updater" },
     { name = "marp-artifact-updater" },
     { name = "pre-commit" },
     { name = "pybind11" },
@@ -1552,6 +1558,7 @@ dev = [
     { name = "ipykernel", specifier = ">=7.3.0" },
     { name = "jupyter-console", specifier = ">=6.6.3" },
     { name = "jupyterlab", specifier = ">=4.6.3" },
+    { name = "markdown-artifact-updater", git = "https://github.com/ineryo/markdown-artifact-updater.git" },
     { name = "marp-artifact-updater", git = "https://github.com/ineryo/marp-artifact-updater.git" },
     { name = "pre-commit", specifier = ">=4.6.2" },
     { name = "pybind11", specifier = ">=3.1.0" },

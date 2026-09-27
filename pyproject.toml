@@ -34,6 +34,7 @@ cache-keys = [
 
 [tool.uv.sources]
 marp-artifact-updater = { git = "https://github.com/ineryo/marp-artifact-updater.git" }
+markdown-artifact-updater = { git = "https://github.com/ineryo/markdown-artifact-updater.git" }
 
 [build-system]
 requires = ["scikit-build-core>=0.10", "pybind11"]
@@ -45,6 +46,7 @@ dev = [
     "ipykernel>=7.3.0",
     "jupyter-console>=6.6.3",
     "jupyterlab>=4.6.3",
+    "markdown-artifact-updater",
     "marp-artifact-updater",
     "pre-commit>=4.6.2",
     "pybind11>=3.1.0",

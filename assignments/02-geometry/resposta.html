@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-BR" xml:lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.10" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Igor de Melo Nery Oliveira" />
+  <title>Lista 02 — Geometria Computacional</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="report.css" />
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Lista 02 — Geometria Computacional</h1>
+<p class="subtitle">Técnicas Computacionais Avançadas — PPGEC/UFAL</p>
+<p class="author">Igor de Melo Nery Oliveira</p>
+<p class="date">22 de setembro de 2026</p>
+</header>
+<p>As soluções consideram o plano <span
+class="math inline">\(\mathbb{R}^2\)</span>, com orientação anti-horária
+positiva e aritmética em <code>double</code>. As primitivas e os
+algoritmos foram implementados em C++ e expostos pela API
+<code>tca.geometry</code>. Este relatório organiza o raciocínio, os
+exemplos e os resultados do <a href="solucao.ipynb">notebook
+revisado</a>; Python é a camada de demonstração e análise.</p>
+<p>A tolerância numérica é centralizada no kernel C++: valores de módulo
+até <span class="math inline">\(\varepsilon=10^{-12}\)</span> são
+considerados nulos. As classificações de localização usam <strong>0 =
+exterior</strong>, <strong>1 = interior</strong> e <strong>2 =
+fronteira</strong>.</p>
+<h2 id="questão-1-pseudo-ângulo">Questão 1 — Pseudo-ângulo</h2>
+<h3 id="interpretação-e-critério">Interpretação e critério</h3>
+<p>Para ordenar vetores em torno da origem, basta saber qual direção vem
+antes da outra; não é necessário medir o ângulo em radianos.
+<code>pseudo_angle</code> atribui valores em <span
+class="math inline">\([0,8)\)</span>, começando no semieixo positivo de
+<span class="math inline">\(x\)</span> e crescendo no sentido
+anti-horário.</p>
+<p>Os sinais das coordenadas identificam o quadrante. Uma comparação
+adicional divide esse quadrante em dois trechos, separados pela
+diagonal. Em cada trecho, uma razão entre coordenadas e um ajuste
+constante produzem a chave de ordenação. A chave preserva a ordem das
+direções, sem calcular norma, raiz quadrada ou função trigonométrica.
+Ela não representa um ângulo em graus.</p>
+<h3 id="verificação-e-leitura-da-figura">Verificação e leitura da
+figura</h3>
+<p>Os quatro semieixos produziram os valores de referência:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Vetor</th>
+<th style="text-align: right;"><span
+class="math inline">\((1,0)\)</span></th>
+<th style="text-align: right;"><span
+class="math inline">\((0,1)\)</span></th>
+<th style="text-align: right;"><span
+class="math inline">\((-1,0)\)</span></th>
+<th style="text-align: right;"><span
+class="math inline">\((0,-1)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Pseudo-ângulo</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">6</td>
+</tr>
+</tbody>
+</table>
+<p>Os vetores <span class="math inline">\((0,0)\)</span> e <span
+class="math inline">\((10^{-13},10^{-13})\)</span> foram rejeitados com
+uma exceção <code>ValueError</code>, capturada no notebook, e a mensagem
+<code>pseudo_angle: vector cannot be the zero vector</code>. Ambos são
+considerados nulos pela tolerância adotada e, portanto, sem direção
+definida.</p>
+<p>O experimento utiliza os 48 pontos de <span
+class="math inline">\(\{-3,-2,-1,0,1,2,3\}^2\)</span>, excluindo a
+origem. Pontos selecionados sobre os eixos e as diagonais recebem
+perturbações de até <span class="math inline">\(10^{-3}\)</span>, com
+semente 42, para exercitar as transições das comparações. Após o
+embaralhamento, os pseudo-ângulos são ordenados pelo Merge Sort C++.</p>
+<p>Na figura, a ordem de entrada não acompanha a posição geométrica,
+enquanto a ordem final percorre as direções no sentido anti-horário. Os
+valores permitem conferir as transições entre quadrantes; pontos sobre
+uma mesma semirreta podem compartilhar a mesma chave.</p>
+<!-- figure-include: assignments/02-geometry/artifacts/q01_pseudo_angle.html?width=100%&height=550&caption=Figura 1 — Ordem de entrada, pseudo-ângulos e ordenação angular dos 48 pontos. -->
+<iframe src="artifacts/q01_pseudo_angle.html" width="100%" height="550" title="interactive plot" frameborder="0">
+</iframe>
+<p><strong>Figura 1 — Ordem de entrada, pseudo-ângulos e ordenação
+angular dos 48 pontos.</strong> <!-- figure-include-end --></p>
+<h3 id="contagem-de-operações">Contagem de operações</h3>
+<p>A contagem do <strong>cálculo principal</strong>, para uma entrada
+admitida, é:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Operação</th>
+<th style="text-align: right;">Quantidade por execução</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Comparações para escolher quadrante e
+trecho</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr>
+<td style="text-align: left;">Divisões</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Somas ou subtrações de ajuste</td>
+<td style="text-align: right;">no máximo 1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Inversões de sinal</td>
+<td style="text-align: right;">até 2</td>
+</tr>
+<tr>
+<td style="text-align: left;">Multiplicações</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;">Raízes quadradas</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;">Valores absolutos</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;">Funções trigonométricas</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p>A validação
+<code>is_zero(vector.x) &amp;&amp; is_zero(vector.y)</code> é adicional
+e não integra essa contagem. Como <code>is_zero</code> usa
+<code>std::abs</code>, a validação acrescenta até dois valores absolutos
+e dois testes de nulidade; o segundo teste depende do primeiro, pelo
+curto-circuito de <code>&amp;&amp;</code>. Essa decisão de projeto
+rejeita entradas sem direção e mantém a política numérica comum.</p>
+<p>O custo da primitiva é <span class="math inline">\(O(1)\)</span>.</p>
+<details>
+<summary>
+Ver implementação de <code>pseudo_angle</code>
+</summary>
+<!-- snippet-include: cpp/src/geometry/primitives.cpp#q01-pseudo-angle -->
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> pseudo_angle<span class="op">(</span><span class="at">const</span> Point2<span class="op">&amp;</span> vector<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>is_zero<span class="op">(</span>vector<span class="op">.</span>x<span class="op">)</span> <span class="op">&amp;&amp;</span> is_zero<span class="op">(</span>vector<span class="op">.</span>y<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">throw</span> <span class="bu">std::</span>invalid_argument<span class="op">(</span><span class="st">&quot;pseudo_angle: vector cannot be the zero vector&quot;</span><span class="op">);</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> result <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>vector<span class="op">.</span>x <span class="op">&gt;=</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>vector<span class="op">.</span>y <span class="op">&gt;=</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> vector<span class="op">.</span>x <span class="op">&gt;=</span> vector<span class="op">.</span>y <span class="op">?</span> vector<span class="op">.</span>y <span class="op">/</span> vector<span class="op">.</span>x <span class="op">:</span> <span class="fl">2.0</span> <span class="op">-</span> vector<span class="op">.</span>x <span class="op">/</span> vector<span class="op">.</span>y<span class="op">;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> vector<span class="op">.</span>x <span class="op">&gt;=</span> <span class="op">-</span>vector<span class="op">.</span>y <span class="op">?</span> <span class="fl">8.0</span> <span class="op">+</span> vector<span class="op">.</span>y <span class="op">/</span> vector<span class="op">.</span>x <span class="op">:</span> <span class="fl">6.0</span> <span class="op">-</span> vector<span class="op">.</span>x <span class="op">/</span> vector<span class="op">.</span>y<span class="op">;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>vector<span class="op">.</span>y <span class="op">&gt;=</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> <span class="op">-</span>vector<span class="op">.</span>x <span class="op">&gt;=</span> vector<span class="op">.</span>y <span class="op">?</span> <span class="fl">4.0</span> <span class="op">+</span> vector<span class="op">.</span>y <span class="op">/</span> vector<span class="op">.</span>x <span class="op">:</span> <span class="fl">2.0</span> <span class="op">-</span> vector<span class="op">.</span>x <span class="op">/</span> vector<span class="op">.</span>y<span class="op">;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> <span class="op">-</span>vector<span class="op">.</span>x <span class="op">&gt;=</span> <span class="op">-</span>vector<span class="op">.</span>y <span class="op">?</span> <span class="fl">4.0</span> <span class="op">+</span> vector<span class="op">.</span>y <span class="op">/</span> vector<span class="op">.</span>x <span class="op">:</span> <span class="fl">6.0</span> <span class="op">-</span> vector<span class="op">.</span>x <span class="op">/</span> vector<span class="op">.</span>y<span class="op">;</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result<span class="op">;</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<!-- snippet-include-end -->
+</details>
+<h2 id="questão-2-pertinência-a-um-ângulo-convexo">Questão 2 —
+Pertinência a um ângulo convexo</h2>
+<h3 id="interpretação-e-critério-1">Interpretação e critério</h3>
+<p>Os vetores <span class="math inline">\(u\)</span> e <span
+class="math inline">\(v\)</span> delimitam uma abertura convexa com
+vértice na origem. Para decidir se <span
+class="math inline">\(w\)</span> está nessa abertura, verifica-se de que
+lado de cada direção limite ele se encontra. O produto vetorial <span
+class="math inline">\(u\times v=u_xv_y-u_yv_x\)</span> fornece essa
+informação sem calcular ângulos.</p>
+<p>Se <span class="math inline">\(u\times v&gt;0\)</span>, a abertura
+vai de <span class="math inline">\(u\)</span> a <span
+class="math inline">\(v\)</span> no sentido anti-horário: <span
+class="math inline">\(w\)</span> pertence a ela quando <span
+class="math inline">\(u\times w\geq0\)</span> e <span
+class="math inline">\(w\times v\geq0\)</span>. Se <span
+class="math inline">\(u\times v&lt;0\)</span>, o percurso é horário e
+ambas as desigualdades se invertem. As igualdades incluem a
+fronteira.</p>
+<p>A função <code>entre(u,v,w)</code> retorna <strong>0</strong> se
+<span class="math inline">\(u\)</span> e <span
+class="math inline">\(v\)</span> são colineares, <strong>1</strong> se
+<span class="math inline">\(w\)</span> pertence ao ângulo convexo,
+incluindo sua fronteira, e <strong>2</strong> se está fora. Os sinais
+são avaliados com a tolerância do projeto.</p>
+<h3 id="verificação">Verificação</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Configuração geométrica</th>
+<th style="text-align: left;"><span
+class="math inline">\(u\)</span></th>
+<th style="text-align: left;"><span
+class="math inline">\(v\)</span></th>
+<th style="text-align: left;"><span
+class="math inline">\(w\)</span></th>
+<th style="text-align: right;">Retorno</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Dentro da abertura</td>
+<td style="text-align: left;"><span
+class="math inline">\((1,0)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((0,1)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((1,1)\)</span></td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Fora da abertura</td>
+<td style="text-align: left;"><span
+class="math inline">\((1,0)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((0,1)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((-1,-1)\)</span></td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;">Fronteira, na direção de <span
+class="math inline">\(u\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((1,0)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((0,1)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((1,0)\)</span></td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Fronteira, na direção de <span
+class="math inline">\(v\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((1,0)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((0,1)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((0,1)\)</span></td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Direções delimitadoras colineares</td>
+<td style="text-align: left;"><span
+class="math inline">\((1,0)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((2,0)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((0,1)\)</span></td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p>A figura aplica o critério aos mesmos 48 pontos da Questão 1. Os três
+pares <span class="math inline">\((u,v)\)</span> são:</p>
+<ul>
+<li>caso 1: <span class="math inline">\((0{,}5,0)\)</span> e <span
+class="math inline">\((0,0{,}5)\)</span>;</li>
+<li>caso 2: <span class="math inline">\((0,-0{,}5)\)</span> e <span
+class="math inline">\((-0{,}5,0)\)</span>;</li>
+<li>caso 3: <span class="math inline">\((2{,}5,1{,}5)\)</span> e <span
+class="math inline">\((-1{,}5,-1{,}5)\)</span>.</li>
+</ul>
+<p>Os casos permitem verificar que a classificação acompanha a abertura
+convexa, inclusive quando o percurso de <span
+class="math inline">\(u\)</span> para <span
+class="math inline">\(v\)</span> é horário.</p>
+<!-- figure-include: assignments/02-geometry/artifacts/q02_entre.html?width=100%&height=550&caption=Figura 2 — Classificação angular em três configurações de u e v. -->
+<iframe src="artifacts/q02_entre.html" width="100%" height="550" title="interactive plot" frameborder="0">
+</iframe>
+<p><strong>Figura 2 — Classificação angular em três configurações de u e
+v.</strong> <!-- figure-include-end --></p>
+<p>A decisão utiliza até três produtos vetoriais e um número fixo de
+testes: tempo e espaço auxiliar <span
+class="math inline">\(O(1)\)</span>.</p>
+<details>
+<summary>
+Ver implementação de <code>entre</code>
+</summary>
+<!-- snippet-include: cpp/src/geometry/primitives.cpp#q02-entre -->
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> entre<span class="op">(</span><span class="at">const</span> Point2<span class="op">&amp;</span> u<span class="op">,</span> <span class="at">const</span> Point2<span class="op">&amp;</span> v<span class="op">,</span> <span class="at">const</span> Point2<span class="op">&amp;</span> w<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Obs.:O algoritmo considera a fronteira (quando w e colinear com u ou v) como pertencente ao angulo convexo.</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Sinal (-1, 0, 1) do produto vetorial u x v.</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// O resultado e 0 quando u e v sao considerados colineares pela tolerancia numerica.</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> <span class="dt">int</span> uv <span class="op">=</span> sign<span class="op">(</span>cross<span class="op">(</span>u<span class="op">,</span> v<span class="op">));</span> </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Classificacao como 0 quando u e v sao colineares.</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>uv <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> <span class="dt">int</span> uw <span class="op">=</span> sign<span class="op">(</span>cross<span class="op">(</span>u<span class="op">,</span> w<span class="op">));</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> <span class="dt">int</span> wv <span class="op">=</span> sign<span class="op">(</span>cross<span class="op">(</span>w<span class="op">,</span> v<span class="op">));</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Se u x v &gt; 0, o angulo convexo vai de u ate v no sentido anti-horario.</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">// w pertence a esse angulo se estiver a esquerda de u e antes de v.</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>uv <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="op">(</span>uw <span class="op">&gt;=</span> <span class="dv">0</span> <span class="op">&amp;&amp;</span> wv <span class="op">&gt;=</span> <span class="dv">0</span><span class="op">)</span> <span class="op">?</span> <span class="dv">1</span> <span class="op">:</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Se u x v &lt; 0, o angulo convexo vai de u ate v no sentido horario.</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">// w pertence a esse angulo se estiver a direita de u e depois de v.</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> uw <span class="op">&lt;=</span> <span class="dv">0</span> <span class="op">&amp;&amp;</span> wv <span class="op">&lt;=</span> <span class="dv">0</span> <span class="op">?</span> <span class="dv">1</span> <span class="op">:</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<!-- snippet-include-end -->
+</details>
+<h2 id="questão-3-localização-por-coordenadas-baricêntricas">Questão 3 —
+Localização por coordenadas baricêntricas</h2>
+<h3 id="interpretação-e-critério-2">Interpretação e critério</h3>
+<p>As coordenadas baricêntricas descrevem a contribuição de cada vértice
+para a posição de um ponto. No interior, as três contribuições são
+positivas; sobre um lado, a contribuição do vértice oposto é nula; ao
+cruzar esse lado para fora, ela se torna negativa.</p>
+<p>Para um triângulo não degenerado,</p>
+<p><span class="math display">\[
+P=\lambda_1P_1+\lambda_2P_2+\lambda_3P_3,
+\qquad \lambda_1+\lambda_2+\lambda_3=1.
+\]</span></p>
+<p>A função <code>locate_point_in_triangle</code> retorna <strong>0 —
+exterior</strong> se alguma coordenada é negativa; <strong>2 —
+fronteira</strong> se nenhuma é negativa e pelo menos uma é nula; e
+<strong>1 — interior</strong> se todas são positivas. Uma coordenada
+nula, sozinha, não basta: o ponto pode estar no prolongamento de um
+lado.</p>
+<h3 id="verificação-1">Verificação</h3>
+<p>Para <span class="math inline">\(P_1=(-2,-1)\)</span>, <span
+class="math inline">\(P_2=(2,-1)\)</span> e <span
+class="math inline">\(P_3=(0,2)\)</span>, obtiveram-se:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Configuração geométrica</th>
+<th style="text-align: left;">Ponto</th>
+<th style="text-align: left;">Coordenadas baricêntricas</th>
+<th style="text-align: right;">Retorno</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Interior</td>
+<td style="text-align: left;"><span
+class="math inline">\((0,0)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((1/3,1/3,1/3)\)</span></td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Fronteira, no vértice <span
+class="math inline">\(P_1\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(P_1\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((1,0,0)\)</span></td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;">Fronteira, no vértice <span
+class="math inline">\(P_2\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(P_2\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((0,1,0)\)</span></td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;">Fronteira, no vértice <span
+class="math inline">\(P_3\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(P_3\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((0,0,1)\)</span></td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;">Fronteira, no lado <span
+class="math inline">\(P_1P_3\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((P_1+2P_3)/3=(-2/3,1)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((1/3,0,2/3)\)</span></td>
+<td style="text-align: right;">2</td>
+</tr>
+</tbody>
+</table>
+<p>A área orientada é <span class="math inline">\(6\)</span> na ordem
+anti-horária e <span class="math inline">\(-6\)</span> na ordem inversa.
+Essa troca de sinal confirma a convenção de orientação.</p>
+<p>A visualização utiliza uma <strong>grade regular de 49
+pontos</strong> <span
+class="math inline">\(\{-3,-2,-1,0,1,2,3\}^2\)</span>, incluindo a
+origem e sem as perturbações da Questão 1. Os três primeiros painéis
+mostram a mudança de sinal de cada coordenada ao cruzar o lado oposto; o
+quarto reúne esses sinais na classificação.</p>
+<!-- figure-include: assignments/02-geometry/artifacts/q03_barycentric_location.html?width=100%&height=930&caption=Figura 3 — Coordenadas baricêntricas e localização dos 49 pontos da grade regular. -->
+<iframe src="artifacts/q03_barycentric_location.html" width="100%" height="930" title="interactive plot" frameborder="0">
+</iframe>
+<p><strong>Figura 3 — Coordenadas baricêntricas e localização dos 49
+pontos da grade regular.</strong> <!-- figure-include-end --></p>
+<h3 id="justificativa-do-cálculo">Justificativa do cálculo</h3>
+<p>Denotando a área orientada por <span
+class="math inline">\(S\)</span>, calculam-se</p>
+<p><span class="math display">\[
+S_{ABC}=\frac12(B-A)\times(C-A),
+\]</span></p>
+<p><span class="math display">\[
+\lambda_1=\frac{S_{PP_2P_3}}{S_{P_1P_2P_3}},\qquad
+\lambda_2=\frac{S_{P_1PP_3}}{S_{P_1P_2P_3}},\qquad
+\lambda_3=1-\lambda_1-\lambda_2.
+\]</span></p>
+<p>O sinal de cada razão indica de que lado da reta correspondente o
+ponto se encontra. A implementação combina <code>oriented_area</code>,
+<code>barycentric_coordinates</code> e
+<code>locate_point_in_triangle</code>. Para um triângulo, o cálculo e a
+classificação custam <span class="math inline">\(O(1)\)</span>.</p>
+<details>
+<summary>
+Ver cálculo das coordenadas baricêntricas
+</summary>
+<!-- snippet-include: cpp/src/geometry/primitives.cpp#q03-barycentric -->
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>array<span class="op">&lt;</span><span class="dt">double</span><span class="op">,</span> <span class="dv">3</span><span class="op">&gt;</span> barycentric_coordinates<span class="op">(</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Point2<span class="op">&amp;</span> point<span class="op">,</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Triangle2<span class="op">&amp;</span> triangle</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> <span class="dt">double</span> area <span class="op">=</span> oriented_area<span class="op">(</span>triangle<span class="op">);</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>is_zero<span class="op">(</span>area<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">throw</span> <span class="bu">std::</span>invalid_argument<span class="op">(</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;barycentric_coordinates: triangle cannot be degenerate&quot;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">);</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Triangle2 triangle_1 <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        point<span class="op">,</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        triangle<span class="op">[</span><span class="dv">1</span><span class="op">],</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>        triangle<span class="op">[</span><span class="dv">2</span><span class="op">],</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Triangle2 triangle_2 <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        triangle<span class="op">[</span><span class="dv">0</span><span class="op">],</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>        point<span class="op">,</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>        triangle<span class="op">[</span><span class="dv">2</span><span class="op">],</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> coord1 <span class="op">=</span> oriented_area<span class="op">(</span>triangle_1<span class="op">)</span> <span class="op">/</span> area<span class="op">;</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> coord2 <span class="op">=</span> oriented_area<span class="op">(</span>triangle_2<span class="op">)</span> <span class="op">/</span> area<span class="op">;</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> coord3 <span class="op">=</span> <span class="fl">1.0</span> <span class="op">-</span> coord1 <span class="op">-</span> coord2<span class="op">;</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">{</span> coord1<span class="op">,</span> coord2<span class="op">,</span> coord3 <span class="op">};</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<!-- snippet-include-end -->
+</details>
+<h2 id="questão-4-recorte-de-um-segmento-por-um-triângulo">Questão 4 —
+Recorte de um segmento por um triângulo</h2>
+<h3 id="formulação">Formulação</h3>
+<p>Recortar um segmento significa conservar apenas a parte que fica no
+triângulo. Ao percorrê-lo, as coordenadas baricêntricas indicam quando
+se entra no triângulo e quando se sai.</p>
+<p>Adota-se a parametrização do notebook,</p>
+<p><span class="math display">\[
+P(t)=tA+(1-t)B,\qquad 0\leq t\leq1,
+\]</span></p>
+<p>na qual <span class="math inline">\(t=0\)</span> corresponde a <span
+class="math inline">\(B\)</span> e <span
+class="math inline">\(t=1\)</span> a <span
+class="math inline">\(A\)</span>. Se <span
+class="math inline">\(\alpha_i\)</span> e <span
+class="math inline">\(\beta_i\)</span> são as coordenadas de <span
+class="math inline">\(A\)</span> e <span
+class="math inline">\(B\)</span>, as coordenadas de <span
+class="math inline">\(P(t)\)</span> variam linearmente:</p>
+<p><span class="math display">\[
+\theta_i(t)=t\alpha_i+(1-t)\beta_i,\qquad i=1,2,3.
+\]</span></p>
+<p>Isso decorre da variação afim da área orientada: <span
+class="math inline">\(S_{P(t)P_2P_3}=tS_{AP_2P_3}+(1-t)S_{BP_2P_3}\)</span>.
+Dividir pela área do triângulo dá a expressão de <span
+class="math inline">\(\theta_1\)</span>; o mesmo raciocínio vale para as
+outras duas coordenadas.</p>
+<p>O exemplo usado em todos os itens é</p>
+<p><span class="math display">\[
+P_1=(0,0),\quad P_2=(4,0),\quad P_3=(0,4),\qquad
+A=(-1,1),\quad B=(3,3).
+\]</span></p>
+<p>As coordenadas baricêntricas calculadas para esses extremos são</p>
+<p><span class="math display">\[
+\alpha=(1,-1/4,1/4),\qquad \beta=(-1/2,3/4,3/4).
+\]</span></p>
+<h3 id="item-a-segmento-completamente-contido">Item (a) — Segmento
+completamente contido</h3>
+<p>Se os dois extremos estão no triângulo, o segmento entre eles também
+está, pois o triângulo é convexo. Incluindo a fronteira, a condição
+necessária e suficiente é</p>
+<p><span class="math display">\[
+\alpha_i\geq0\quad\text{e}\quad\beta_i\geq0,\qquad i=1,2,3.
+\]</span></p>
+<p>Cada <span class="math inline">\(\theta_i(t)\)</span> é uma
+combinação convexa de dois valores não negativos; portanto, nenhuma
+coordenada se torna negativa durante o percurso.</p>
+<h4 id="verificação-do-item-a">Verificação do item (a)</h4>
+<p>No exemplo, <span class="math inline">\(\alpha_2=-1/4\)</span> e
+<span class="math inline">\(\beta_1=-1/2\)</span>: ambos os extremos são
+exteriores. O teste de contenção completa retorna <code>False</code>,
+mas parte do segmento ainda pode atravessar o triângulo.</p>
+<h3 id="item-b-condição-suficiente-de-exterioridade">Item (b) — Condição
+suficiente de exterioridade</h3>
+<p>Se os extremos estão no mesmo semiplano exterior a um lado, nenhum
+ponto do segmento pode entrar no triângulo. Basta encontrar <strong>uma
+mesma coordenada</strong> negativa nos dois extremos:</p>
+<p><span class="math display">\[
+\exists i:\quad\alpha_i&lt;0\quad\text{e}\quad\beta_i&lt;0.
+\]</span></p>
+<p>Nesse caso, <span class="math inline">\(\theta_i(t)&lt;0\)</span>
+para todo <span class="math inline">\(t\in[0,1]\)</span>. A condição é
+suficiente, mas não necessária: sua falha não garante interseção.</p>
+<h4 id="verificação-do-item-b">Verificação do item (b)</h4>
+<p>Em <span class="math inline">\(A\)</span>, a coordenada negativa é a
+segunda; em <span class="math inline">\(B\)</span>, é a primeira. Como
+não há uma mesma coordenada negativa nos dois extremos, o teste
+suficiente de exterioridade retorna <code>False</code>. Os extremos são
+exteriores, mas esse resultado não permite descartar o segmento. É
+preciso calcular as interseções com as retas dos lados.</p>
+<h3 id="item-c-interseções-com-as-retas-dos-lados">Item (c) —
+Interseções com as retas dos lados</h3>
+<p>Ao atingir a reta de um lado, a coordenada do vértice oposto se
+anula: <span class="math inline">\(\theta_1=0\)</span> identifica a reta
+<span class="math inline">\(P_2P_3\)</span>; <span
+class="math inline">\(\theta_2=0\)</span>, a reta <span
+class="math inline">\(P_3P_1\)</span>; e <span
+class="math inline">\(\theta_3=0\)</span>, a reta <span
+class="math inline">\(P_1P_2\)</span>.</p>
+<h4 id="cálculo-das-interseções">Cálculo das interseções</h4>
+<p>Para cada coordenada, resolve-se uma equação linear:</p>
+<p><span class="math display">\[
+t\alpha_i+(1-t)\beta_i=0
+\quad\Longrightarrow\quad
+t_i=\frac{\beta_i}{\beta_i-\alpha_i},\qquad
+X_i=t_iA+(1-t_i)B.
+\]</span></p>
+<p>A expressão vale quando <span
+class="math inline">\(\alpha_i\ne\beta_i\)</span>. Para o encontro
+pertencer ao segmento <span class="math inline">\(AB\)</span>, exige-se
+<span class="math inline">\(0\leq t_i\leq1\)</span>; para pertencer ao
+lado do triângulo, as outras duas coordenadas também devem ser não
+negativas. Isso evita confundir o lado com seu prolongamento.</p>
+<p>Se <span class="math inline">\(\alpha_i=\beta_i\ne0\)</span>, o
+segmento é paralelo à reta correspondente e não a intercepta. Se ambas
+são zero, o segmento inteiro pertence a essa reta, e as demais
+coordenadas delimitam a parte pertencente ao triângulo. Como há apenas
+três coordenadas, o cálculo custa <span
+class="math inline">\(O(1)\)</span>.</p>
+<h4 id="exemplo-e-resultados">Exemplo e resultados</h4>
+<p>Para os extremos adotados,</p>
+<p><span class="math display">\[
+\theta_1(t)=\frac32t-\frac12,\qquad
+\theta_2(t)=\frac34-t,\qquad
+\theta_3(t)=\frac34-\frac12t.
+\]</span></p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Reta</th>
+<th style="text-align: left;">Parâmetro</th>
+<th style="text-align: left;">Ponto</th>
+<th style="text-align: left;">Interpretação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(P_2P_3\)</span>: <span
+class="math inline">\(x+y=4\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(t_1=1/3\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(X_1=(5/3,7/3)\)</span></td>
+<td style="text-align: left;">entrada no triângulo</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(P_3P_1\)</span>: <span
+class="math inline">\(x=0\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(t_2=3/4\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(X_2=(0,3/2)\)</span></td>
+<td style="text-align: left;">saída do triângulo</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(P_1P_2\)</span>: <span
+class="math inline">\(y=0\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(t_3=3/2\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(X_3=(-3,0)\)</span></td>
+<td style="text-align: left;">fora do segmento <span
+class="math inline">\(AB\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Os dois primeiros pontos têm as demais coordenadas não negativas.
+Logo, a parte conservada é</p>
+<p><span class="math display">\[
+\boxed{\frac13\leq t\leq\frac34},\qquad
+\boxed{X_1=(5/3,7/3),\quad X_2=(0,3/2)}.
+\]</span></p>
+<p>As localizações calculadas no notebook confirmam a mudança de
+região:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Interpretação geométrica</th>
+<th style="text-align: left;"><span
+class="math inline">\(t\)</span></th>
+<th style="text-align: left;"><span
+class="math inline">\(P(t)\)</span></th>
+<th style="text-align: right;">Retorno</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Exterior, no extremo <span
+class="math inline">\(B\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(0\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((3,3)\)</span></td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;">Fronteira, na entrada</td>
+<td style="text-align: left;"><span
+class="math inline">\(1/3\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((5/3,7/3)\)</span></td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;">Interior</td>
+<td style="text-align: left;"><span
+class="math inline">\(1/2\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((1,2)\)</span></td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Fronteira, na saída</td>
+<td style="text-align: left;"><span
+class="math inline">\(3/4\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((0,3/2)\)</span></td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;">Exterior, no extremo <span
+class="math inline">\(A\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(1\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((-1,1)\)</span></td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p>Na figura, os zeros das coordenadas no painel esquerdo correspondem
+aos encontros geométricos no painel direito. Entre <span
+class="math inline">\(1/3\)</span> e <span
+class="math inline">\(3/4\)</span>, as três coordenadas são não
+negativas; fora desse intervalo, ao menos uma é negativa. A verificação
+reutiliza as primitivas baricêntricas da Questão 3.</p>
+<!-- figure-include: assignments/02-geometry/artifacts/q04_clipping.html?width=100%&height=650&caption=Figura 4 — Coordenadas baricêntricas ao longo de AB e trecho conservado pelo recorte. -->
+<iframe src="artifacts/q04_clipping.html" width="100%" height="650" title="interactive plot" frameborder="0">
+</iframe>
+<p><strong>Figura 4 — Coordenadas baricêntricas ao longo de AB e trecho
+conservado pelo recorte.</strong> <!-- figure-include-end --></p>
+<h2 id="questão-5-disjunção-entre-triângulos">Questão 5 — Disjunção
+entre triângulos</h2>
+<h3 id="interpretação-e-solução">Interpretação e solução</h3>
+<p>Dois triângulos são disjuntos quando não compartilham nenhum ponto.
+Tocar em um vértice ou em uma aresta, portanto, já impede a
+disjunção.</p>
+<p>O algoritmo procura primeiro interseções entre os pares de arestas,
+incluindo cruzamentos, contatos e sobreposições colineares. Se não
+houver encontro das bordas, verifica a contenção de um triângulo no
+outro. Essa segunda etapa é necessária: um triângulo pode estar
+inteiramente dentro do outro sem que suas arestas se cruzem.</p>
+<p>Se nenhuma dessas situações ocorre,
+<code>triangles_are_disjoint</code> retorna <code>True</code>.
+Triângulos degenerados são rejeitados com uma exceção
+<code>ValueError</code>.</p>
+<h3 id="verificação-2">Verificação</h3>
+<p>Cada triângulo <span class="math inline">\(T_i\)</span> é comparado
+com o triângulo-base <span
+class="math inline">\(T_0=((0,0),(4,0),(0,4))\)</span>. A tabela
+apresenta os vértices na ordem de entrada e o retorno de
+<code>triangles_are_disjoint(T0, Ti)</code>.</p>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 23%" />
+<col style="width: 23%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Configuração em relação a <span
+class="math inline">\(T_0\)</span></th>
+<th style="text-align: left;">Triângulo</th>
+<th style="text-align: left;">Vértices na ordem de entrada</th>
+<th style="text-align: center;">Retorno</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Triângulos idênticos</td>
+<td style="text-align: left;"><span
+class="math inline">\(T_0\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((0,0)\to(4,0)\to(0,4)\)</span></td>
+<td style="text-align: center;"><code>False</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Completamente separado</td>
+<td style="text-align: left;"><span
+class="math inline">\(T_1\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((5,5)\to(7,5)\to(5,7)\)</span></td>
+<td style="text-align: center;"><code>True</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Sobreposição parcial</td>
+<td style="text-align: left;"><span
+class="math inline">\(T_2\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((2,1)\to(5,1)\to(2,4)\)</span></td>
+<td style="text-align: center;"><code>False</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Completamente contido</td>
+<td style="text-align: left;"><span
+class="math inline">\(T_3\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((0{,}5,0{,}5)\to(1{,}5,0{,}5)\to(0{,}5,1{,}5)\)</span></td>
+<td style="text-align: center;"><code>False</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Contato em um vértice</td>
+<td style="text-align: left;"><span
+class="math inline">\(T_4\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((4,0)\to(6,0)\to(4,2)\)</span></td>
+<td style="text-align: center;"><code>False</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Aresta compartilhada</td>
+<td style="text-align: left;"><span
+class="math inline">\(T_5\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((0,0)\to(4,0)\to(2,-2)\)</span></td>
+<td style="text-align: center;"><code>False</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Cruzamento de arestas</td>
+<td style="text-align: left;"><span
+class="math inline">\(T_6\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((2,-1)\to(5,2)\to(2,5)\)</span></td>
+<td style="text-align: center;"><code>False</code></td>
+</tr>
+</tbody>
+</table>
+<p>A figura distingue visualmente os seis casos. O triângulo contido
+justifica a segunda etapa do algoritmo; os contatos confirmam que a
+fronteira faz parte dos triângulos.</p>
+<!-- figure-include: assignments/02-geometry/artifacts/q05_triangle_disjointness.html?width=100%&height=880&caption=Figura 5 — Seis configurações de dois triângulos e respectivos resultados de disjunção. -->
+<iframe src="artifacts/q05_triangle_disjointness.html" width="100%" height="880" title="interactive plot" frameborder="0">
+</iframe>
+<p><strong>Figura 5 — Seis configurações de dois triângulos e
+respectivos resultados de disjunção.</strong>
+<!-- figure-include-end --></p>
+<p>A matriz completa do notebook confirma a simetria da relação e o
+resultado <code>False</code> na diagonal: nenhum triângulo é disjunto de
+si mesmo.</p>
+<details>
+<summary>
+Ver resultados para todos os pares de triângulos
+</summary>
+<p>Cada célula contém o retorno de <code>triangles_are_disjoint</code>
+para o par indicado.</p>
+<table>
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: center;"><span
+class="math inline">\(T_0\)</span></th>
+<th style="text-align: center;"><span
+class="math inline">\(T_1\)</span></th>
+<th style="text-align: center;"><span
+class="math inline">\(T_2\)</span></th>
+<th style="text-align: center;"><span
+class="math inline">\(T_3\)</span></th>
+<th style="text-align: center;"><span
+class="math inline">\(T_4\)</span></th>
+<th style="text-align: center;"><span
+class="math inline">\(T_5\)</span></th>
+<th style="text-align: center;"><span
+class="math inline">\(T_6\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(T_0\)</span></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>False</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(T_1\)</span></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>True</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(T_2\)</span></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>False</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(T_3\)</span></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>True</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(T_4\)</span></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>False</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(T_5\)</span></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>False</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(T_6\)</span></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>True</code></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>False</code></td>
+<td style="text-align: center;"><code>False</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<p>São no máximo nove testes entre arestas e seis localizações de
+vértices: tempo e espaço auxiliar <span
+class="math inline">\(O(1)\)</span>. A <a
+href="#ap-disjuncao">implementação completa está no apêndice</a>.</p>
+<h2 id="questão-6-convexidade-de-um-polígono">Questão 6 — Convexidade de
+um polígono</h2>
+<h3 id="interpretação-e-critério-3">Interpretação e critério</h3>
+<p>Ao caminhar pela borda de um polígono convexo, todas as mudanças de
+direção ocorrem para o mesmo lado. Uma concavidade introduz um giro no
+sentido oposto. Para um polígono simples, cuja borda não se cruza, basta
+percorrer os vértices na ordem da borda e comparar os giros
+consecutivos.</p>
+<p>Para cada trio consecutivo, incluindo os trios que atravessam o
+fechamento, calcula-se o sinal de</p>
+<p><span class="math display">\[
+(P_{i+1}-P_i)\times(P_{i+2}-P_{i+1}).
+\]</span></p>
+<p>O primeiro giro estabelece o sinal de referência. Um sinal diferente
+rejeita o polígono. Todos positivos correspondem ao percurso
+anti-horário; todos negativos, ao horário. Portanto, a orientação global
+não altera a resposta.</p>
+<p><strong>Política para colinearidade.</strong> Um giro nulo também
+retorna <code>False</code>, pois foi adotada uma representação mínima,
+sem vértices intermediários colineares redundantes. Assim, uma região
+pode ser convexa como conjunto e sua representação ser rejeitada por
+esse contrato. A função não remove esses vértices.</p>
+<h3 id="verificação-3">Verificação</h3>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Configuração</th>
+<th style="text-align: left;">Interpretação dos giros</th>
+<th style="text-align: center;">Retorno de <code>is_convex</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Convexo anti-horário</td>
+<td style="text-align: left;">Giros positivos</td>
+<td style="text-align: center;"><code>True</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Mesmo convexo em ordem inversa</td>
+<td style="text-align: left;">Giros negativos</td>
+<td style="text-align: center;"><code>True</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Côncavo</td>
+<td style="text-align: left;">Mudança de sinal</td>
+<td style="text-align: center;"><code>False</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Retângulo com vértice colinear
+intermediário</td>
+<td style="text-align: left;">Giro nulo no vértice redundante</td>
+<td style="text-align: center;"><code>False</code></td>
+</tr>
+</tbody>
+</table>
+<p>A inversão da ordem preserva a forma e a resposta. No último painel,
+a rejeição decorre do vértice redundante, e não de uma reentrância
+geométrica.</p>
+<!-- figure-include: assignments/02-geometry/artifacts/q06_convexity.html?width=100%&height=930&caption=Figura 6 — Efeito da orientação, da concavidade e de um vértice colinear sobre o teste. -->
+<iframe src="artifacts/q06_convexity.html" width="100%" height="930" title="interactive plot" frameborder="0">
+</iframe>
+<p><strong>Figura 6 — Efeito da orientação, da concavidade e de um
+vértice colinear sobre o teste.</strong> <!-- figure-include-end --></p>
+<p>Cada um dos <span class="math inline">\(n\)</span> vértices participa
+de um teste de custo constante. A complexidade é <strong><span
+class="math inline">\(O(n)\)</span></strong>, com espaço auxiliar
+<strong><span class="math inline">\(O(1)\)</span></strong>. O <a
+href="#ap-convexidade">algoritmo completo está no apêndice</a>.</p>
+<h2 id="questão-7-localização-pela-primeira-interseção">Questão 7 —
+Localização pela primeira interseção</h2>
+<h3 id="interpretação-geométrica">Interpretação geométrica</h3>
+<p>Considere uma semirreta horizontal para a direita, partindo de <span
+class="math inline">\(p_0\)</span>, e seu primeiro encontro <span
+class="math inline">\(u\)</span> com a borda. Entre <span
+class="math inline">\(p_0\)</span> e <span
+class="math inline">\(u\)</span> não há outro encontro com a fronteira;
+logo, <span class="math inline">\(p_0\)</span> está na mesma região que
+o trecho imediatamente anterior a <span
+class="math inline">\(u\)</span>.</p>
+<p>Em um polígono simples orientado no <strong>sentido horário</strong>,
+o interior fica localmente à <strong>direita</strong> de cada lado
+percorrido. Conhecendo o lado <span class="math inline">\(p_i\to
+p_{i+1}\)</span> atingido, basta identificar de que lado dele chega a
+semirreta. O argumento usa a vizinhança da primeira interseção e vale
+também para polígonos côncavos.</p>
+<h3 id="critério-e-informações-necessárias">Critério e informações
+necessárias</h3>
+<p>Basta armazenar <strong>o ponto <span
+class="math inline">\(u\)</span> e o índice do lado <span
+class="math inline">\(p_i\to p_{i+1}\)</span></strong>. O índice permite
+recuperar os extremos do lado. Definindo <span
+class="math inline">\(e=p_{i+1}-p_i\)</span>, a decisão é:</p>
+<ul>
+<li>se <span class="math inline">\(u=p_0\)</span>, o ponto está na
+fronteira: <strong>2</strong>;</li>
+<li>se não existe interseção, o ponto é exterior:
+<strong>0</strong>;</li>
+<li>nos demais casos, o sinal distingue os dois lados:</li>
+</ul>
+<p><span class="math display">\[
+e\times(p_0-u)&lt;0\ \Longrightarrow\ \text{interior (1)},
+\]</span></p>
+<p><span class="math display">\[
+e\times(p_0-u)&gt;0\ \Longrightarrow\ \text{exterior (0)}.
+\]</span></p>
+<p>Não é necessário armazenar nem contar todas as interseções. A
+primeira delimita um trecho livre de fronteira, e o lado orientado
+fornece o sinal que identifica a região desse trecho. Em encontros num
+vértice, é preciso associar o lado incidente adequado; o exemplo abaixo
+inclui esse caso.</p>
+<h3 id="verificação-4">Verificação</h3>
+<p>O polígono do notebook tem vértices <span
+class="math inline">\((0,0)\)</span>, <span
+class="math inline">\((-1,4)\)</span>, <span
+class="math inline">\((2,1{,}5)\)</span>, <span
+class="math inline">\((5,3{,}5)\)</span> e <span
+class="math inline">\((4,0)\)</span>, nessa ordem. A área orientada
+calculada é <strong><span class="math inline">\(-12\)</span></strong>,
+confirmando o percurso horário.</p>
+<p>A tabela numera os vértices de 1 a 5; <code>edge_index</code> começa
+em zero.</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Configuração geométrica</th>
+<th style="text-align: left;"><span
+class="math inline">\(p_0\)</span></th>
+<th style="text-align: left;">Primeira interseção <span
+class="math inline">\(u\)</span></th>
+<th style="text-align: left;">Lado associado</th>
+<th style="text-align: right;">Retorno</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Interior</td>
+<td style="text-align: left;"><span
+class="math inline">\((1,1)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((30/7,1)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(p_4\to
+p_5\)</span></td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Exterior à esquerda</td>
+<td style="text-align: left;"><span
+class="math inline">\((-1,1{,}5)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((-3/8,1{,}5)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(p_1\to
+p_2\)</span></td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;">Exterior à direita, sem interseção</td>
+<td style="text-align: left;"><span
+class="math inline">\((5,2)\)</span></td>
+<td style="text-align: left;"><code>None</code></td>
+<td style="text-align: left;">—</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;">Exterior, na reentrância</td>
+<td style="text-align: left;"><span
+class="math inline">\((2,2{,}5)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((7/2,5/2)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(p_3\to
+p_4\)</span></td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;">Fronteira</td>
+<td style="text-align: left;"><span
+class="math inline">\((2,0)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((2,0)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(p_5\to
+p_1\)</span></td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;">Exterior, com a semirreta atingindo um
+vértice</td>
+<td style="text-align: left;"><span
+class="math inline">\((-1,0)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((0,0)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(p_1\to
+p_2\)</span></td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p>Para interpretar o primeiro resultado, <span
+class="math inline">\(p_4\to p_5\)</span> tem vetor <span
+class="math inline">\(e=(-1,-7/2)\)</span> e <span
+class="math inline">\(p_0-u=(-23/7,0)\)</span>. O produto vale <span
+class="math inline">\(-23/2&lt;0\)</span>: o ponto chega pela direita do
+lado e é interior. Para <span
+class="math inline">\(p_0=(-1,1{,}5)\)</span>, o produto vale <span
+class="math inline">\(5/2&gt;0\)</span>, confirmando o exterior.</p>
+<p>Na figura, os segmentos tracejados terminam no primeiro encontro. O
+caso da reentrância mostra que estar dentro do retângulo delimitador não
+basta para estar dentro do polígono. Já o ponto na fronteira coincide
+com sua própria primeira interseção.</p>
+<!-- figure-include: assignments/02-geometry/artifacts/q07_first_intersection.html?width=100%&height=810&caption=Figura 7 — Primeira interseção, lado associado e classificação dos seis pontos. -->
+<iframe src="artifacts/q07_first_intersection.html" width="100%" height="810" title="interactive plot" frameborder="0">
+</iframe>
+<p><strong>Figura 7 — Primeira interseção, lado associado e
+classificação dos seis pontos.</strong> <!-- figure-include-end --></p>
+<h3 id="custo-e-implementação">Custo e implementação</h3>
+<p>A busca <code>first_horizontal_intersection</code> percorre as
+arestas e conserva apenas a interseção mais próxima, junto com seu lado:
+<strong><span class="math inline">\(O(n)\)</span></strong> de tempo e
+<strong><span class="math inline">\(O(1)\)</span></strong> de espaço
+auxiliar. Depois disso, <code>locate_from_first_intersection</code>
+classifica o ponto em <strong><span
+class="math inline">\(O(1)\)</span></strong>.</p>
+<p>A <a href="#ap-primeira-intersecao">busca completa está no
+apêndice</a>. O trecho abaixo mostra a decisão pelo sinal, aplicada
+depois de verificar se há interseção e se <span
+class="math inline">\(u\)</span> coincide com <span
+class="math inline">\(p_0\)</span>.</p>
+<details>
+<summary>
+Ver decisão pelo sinal do produto vetorial
+</summary>
+<!-- snippet-include: cpp/src/geometry/algorithms.cpp#q07-side-decision -->
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> <span class="dt">int</span> side <span class="op">=</span> sign<span class="op">(</span>cross<span class="op">(</span>edge<span class="op">,</span> u_to_point<span class="op">));</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// A Questao 7 assume que o poligono esta orientado no sentido</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">// horario. Nesse caso, seu interior esta a direita de cada lado.</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>side <span class="op">&lt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span> <span class="co">// interior</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>side <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span> <span class="co">// exterior</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span></code></pre></div>
+<!-- snippet-include-end -->
+</details>
+<h2 id="apêndice-implementações-selecionadas">Apêndice — Implementações
+selecionadas</h2>
+<p>Os trechos abaixo vêm dos arquivos C++ canônicos. Reúnem
+implementações mais extensas usadas nas explicações, sem código de
+visualização.</p>
+<h3 id="ap-disjuncao">Disjunção entre triângulos</h3>
+<details>
+<summary>
+Ver implementação completa de <code>triangles_are_disjoint</code>
+</summary>
+<!-- snippet-include: cpp/src/geometry/algorithms.cpp#q05-triangle-disjointness -->
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">bool</span> triangles_are_disjoint<span class="op">(</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Triangle2<span class="op">&amp;</span> first<span class="op">,</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Triangle2<span class="op">&amp;</span> second</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Triangulos degenerados nao fazem parte do dominio desta funcao.</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>is_zero<span class="op">(</span>oriented_area<span class="op">(</span>first<span class="op">))</span> <span class="op">||</span> is_zero<span class="op">(</span>oriented_area<span class="op">(</span>second<span class="op">)))</span> <span class="op">{</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">throw</span> <span class="bu">std::</span>invalid_argument<span class="op">(</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;triangles_are_disjoint: triangles cannot be degenerate&quot;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        <span class="op">);</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Cada triangulo possui tres lados.</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Segment2 first_edges<span class="op">[]</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span>first<span class="op">[</span><span class="dv">0</span><span class="op">],</span> first<span class="op">[</span><span class="dv">1</span><span class="op">]},</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span>first<span class="op">[</span><span class="dv">1</span><span class="op">],</span> first<span class="op">[</span><span class="dv">2</span><span class="op">]},</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span>first<span class="op">[</span><span class="dv">2</span><span class="op">],</span> first<span class="op">[</span><span class="dv">0</span><span class="op">]},</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Segment2 second_edges<span class="op">[]</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span>second<span class="op">[</span><span class="dv">0</span><span class="op">],</span> second<span class="op">[</span><span class="dv">1</span><span class="op">]},</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span>second<span class="op">[</span><span class="dv">1</span><span class="op">],</span> second<span class="op">[</span><span class="dv">2</span><span class="op">]},</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span>second<span class="op">[</span><span class="dv">2</span><span class="op">],</span> second<span class="op">[</span><span class="dv">0</span><span class="op">]},</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Busca exaustiva de intersecoes entre todos os lados dos dois triangulos.</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="at">const</span> Segment2<span class="op">&amp;</span> first_edge <span class="op">:</span> first_edges<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="at">const</span> Segment2<span class="op">&amp;</span> second_edge <span class="op">:</span> second_edges<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>            <span class="co">// Se houver interseccao entre algum par de lados, os triangulos nao sao disjuntos.</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span>segments_intersect<span class="op">(</span>first_edge<span class="op">,</span> second_edge<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    <span class="co">// O primeiro triangulo esta completamente dentro do segundo?</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="at">const</span> Point2<span class="op">&amp;</span> point <span class="op">:</span> first<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>locate_point_in_triangle<span class="op">(</span>point<span class="op">,</span> second<span class="op">)</span> <span class="op">!=</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    <span class="co">// O segundo triangulo esta completamente dentro do primeiro?</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="at">const</span> Point2<span class="op">&amp;</span> point <span class="op">:</span> second<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>locate_point_in_triangle<span class="op">(</span>point<span class="op">,</span> first<span class="op">)</span> <span class="op">!=</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Se nenhum dos casos acima ocorreu, os triangulos sao disjuntos.</span></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<!-- snippet-include-end -->
+</details>
+<h3 id="ap-convexidade">Convexidade</h3>
+<details>
+<summary>
+Ver algoritmo completo de convexidade
+</summary>
+<!-- snippet-include: cpp/src/geometry/algorithms.cpp#q06-convexity -->
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">bool</span> is_convex<span class="op">(</span><span class="at">const</span> Polygon2<span class="op">&amp;</span> polygon<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>polygon<span class="op">.</span>size<span class="op">()</span> <span class="op">&lt;</span> <span class="dv">3</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">throw</span> <span class="bu">std::</span>invalid_argument<span class="op">(</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;is_convex: polygon must have at least three vertices&quot;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">);</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> reference_orientation <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> <span class="bu">std::</span>size_t n <span class="op">=</span> polygon<span class="op">.</span>size<span class="op">();</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">// O(n) algo: itera sobre todos os vertices do poligono</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="bu">std::</span>size_t i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">const</span> Point2<span class="op">&amp;</span> a <span class="op">=</span> polygon<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">const</span> Point2<span class="op">&amp;</span> b <span class="op">=</span> polygon<span class="op">[(</span>i <span class="op">+</span> <span class="dv">1</span><span class="op">)</span> <span class="op">%</span> n<span class="op">];</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">const</span> Point2<span class="op">&amp;</span> c <span class="op">=</span> polygon<span class="op">[(</span>i <span class="op">+</span> <span class="dv">2</span><span class="op">)</span> <span class="op">%</span> n<span class="op">];</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">const</span> Vector2 ab <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>            b<span class="op">.</span>x <span class="op">-</span> a<span class="op">.</span>x<span class="op">,</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>            b<span class="op">.</span>y <span class="op">-</span> a<span class="op">.</span>y<span class="op">,</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>        <span class="op">};</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>        <span class="at">const</span> Vector2 bc <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>            c<span class="op">.</span>x <span class="op">-</span> b<span class="op">.</span>x<span class="op">,</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>            c<span class="op">.</span>y <span class="op">-</span> b<span class="op">.</span>y<span class="op">,</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>        <span class="op">};</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>        <span class="at">const</span> <span class="dt">int</span> current_orientation <span class="op">=</span> sign<span class="op">(</span>cross<span class="op">(</span>ab<span class="op">,</span> bc<span class="op">));</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Um giro nulo significa que tres vertices consecutivos sao</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>        <span class="co">// colineares. Nesse caso, o vertice intermediario e redundante</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>        <span class="co">// e o poligono nao possui a representacao minima adotada.</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>current_orientation <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>        <span class="co">// A primeira orientacao define o sentido esperado</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>        <span class="co">// para todos os demais vertices.</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>reference_orientation <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>            reference_orientation <span class="op">=</span> current_orientation<span class="op">;</span></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span><span class="op">;</span></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Uma mudanca de sinal indica uma mudanca no sentido do giro</span></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>        <span class="co">// e, portanto, a existencia de uma concavidade.</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>current_orientation <span class="op">!=</span> reference_orientation<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Todos os vertices produzem giros estritamente no mesmo sentido.</span></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<!-- snippet-include-end -->
+</details>
+<h3 id="ap-primeira-intersecao">Busca da primeira interseção</h3>
+<details>
+<summary>
+Ver implementação completa de <code>first_horizontal_intersection</code>
+</summary>
+<!-- snippet-include: cpp/src/geometry/algorithms.cpp#q07-first-intersection -->
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>optional<span class="op">&lt;</span>RayIntersection<span class="op">&gt;</span> first_horizontal_intersection<span class="op">(</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Point2<span class="op">&amp;</span> point<span class="op">,</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> Polygon2<span class="op">&amp;</span> polygon</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>polygon<span class="op">.</span>size<span class="op">()</span> <span class="op">&lt;</span> <span class="dv">3</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">throw</span> <span class="bu">std::</span>invalid_argument<span class="op">(</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;first_horizontal_intersection: polygon must have at least three vertices&quot;</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">);</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>optional<span class="op">&lt;</span>RayIntersection<span class="op">&gt;</span> first_intersection<span class="op">;</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> <span class="bu">std::</span>size_t n <span class="op">=</span> polygon<span class="op">.</span>size<span class="op">();</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">// O(n): percorre cada lado do poligono uma unica vez.</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="bu">std::</span>size_t i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">const</span> Point2<span class="op">&amp;</span> a <span class="op">=</span> polygon<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">const</span> Point2<span class="op">&amp;</span> b <span class="op">=</span> polygon<span class="op">[(</span>i <span class="op">+</span> <span class="dv">1</span><span class="op">)</span> <span class="op">%</span> n<span class="op">];</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Vetor AB = B - A, correspondente ao lado atual do poligono.</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">const</span> Vector2 ab <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>            b<span class="op">.</span>x <span class="op">-</span> a<span class="op">.</span>x<span class="op">,</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>            b<span class="op">.</span>y <span class="op">-</span> a<span class="op">.</span>y<span class="op">,</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>        <span class="op">};</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Vetor AP = P - A, do vertice A ate o ponto p0.</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">const</span> Vector2 ap <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>            point<span class="op">.</span>x <span class="op">-</span> a<span class="op">.</span>x<span class="op">,</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>            point<span class="op">.</span>y <span class="op">-</span> a<span class="op">.</span>y<span class="op">,</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>        <span class="op">};</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Se p0 pertence ao lado AB, a primeira intersecao e o proprio p0.</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Esse caso sera posteriormente classificado como fronteira.</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>            sign<span class="op">(</span>cross<span class="op">(</span>ab<span class="op">,</span> ap<span class="op">))</span> <span class="op">==</span> <span class="dv">0</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>            point<span class="op">.</span>x <span class="op">&gt;=</span> <span class="bu">std::</span>min<span class="op">(</span>a<span class="op">.</span>x<span class="op">,</span> b<span class="op">.</span>x<span class="op">)</span> <span class="op">-</span> DEFAULT_TOLERANCE <span class="op">&amp;&amp;</span></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>            point<span class="op">.</span>x <span class="op">&lt;=</span> <span class="bu">std::</span>max<span class="op">(</span>a<span class="op">.</span>x<span class="op">,</span> b<span class="op">.</span>x<span class="op">)</span> <span class="op">+</span> DEFAULT_TOLERANCE <span class="op">&amp;&amp;</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>            point<span class="op">.</span>y <span class="op">&gt;=</span> <span class="bu">std::</span>min<span class="op">(</span>a<span class="op">.</span>y<span class="op">,</span> b<span class="op">.</span>y<span class="op">)</span> <span class="op">-</span> DEFAULT_TOLERANCE <span class="op">&amp;&amp;</span></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>            point<span class="op">.</span>y <span class="op">&lt;=</span> <span class="bu">std::</span>max<span class="op">(</span>a<span class="op">.</span>y<span class="op">,</span> b<span class="op">.</span>y<span class="op">)</span> <span class="op">+</span> DEFAULT_TOLERANCE</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>        <span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> RayIntersection<span class="op">{</span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>                point<span class="op">,</span></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>                i<span class="op">,</span></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>            <span class="op">};</span></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Caso especial: a semirreta horizontal coincide com um lado</span></span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>        <span class="co">// horizontal do poligono.</span></span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>almost_equal<span class="op">(</span>a<span class="op">.</span>y<span class="op">,</span> b<span class="op">.</span>y<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>            <span class="at">const</span> <span class="dt">bool</span> left_is_a <span class="op">=</span> a<span class="op">.</span>x <span class="op">&lt;</span> b<span class="op">.</span>x<span class="op">;</span></span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>            <span class="at">const</span> Point2<span class="op">&amp;</span> u <span class="op">=</span> left_is_a <span class="op">?</span> a <span class="op">:</span> b<span class="op">;</span></span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>            <span class="co">// Se p0 esta alinhado com esse lado e antes de seu extremo</span></span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>            <span class="co">// esquerdo, esse vertice e a primeira intersecao u.</span></span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span></span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>                almost_equal<span class="op">(</span>point<span class="op">.</span>y<span class="op">,</span> a<span class="op">.</span>y<span class="op">)</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>                point<span class="op">.</span>x <span class="op">&lt;</span> u<span class="op">.</span>x <span class="op">-</span> DEFAULT_TOLERANCE</span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>            <span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>                <span class="co">// Em u encontram-se dois lados. Para a classificacao,</span></span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>                <span class="co">// guarda o lado incidente que nao e horizontal.</span></span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>                <span class="at">const</span> <span class="bu">std::</span>size_t edge_index <span class="op">=</span></span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a>                    left_is_a <span class="op">?</span> <span class="op">(</span>i <span class="op">+</span> n <span class="op">-</span> <span class="dv">1</span><span class="op">)</span> <span class="op">%</span> n <span class="op">:</span> <span class="op">(</span>i <span class="op">+</span> <span class="dv">1</span><span class="op">)</span> <span class="op">%</span> n<span class="op">;</span></span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>                <span class="co">// Mantem somente a intersecao mais proxima de p0.</span></span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="op">(</span></span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a>                    <span class="op">!</span>first_intersection <span class="op">||</span></span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>                    u<span class="op">.</span>x <span class="op">&lt;</span> first_intersection<span class="op">-&gt;</span>point<span class="op">.</span>x</span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a>                <span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>                    first_intersection <span class="op">=</span> RayIntersection<span class="op">{</span></span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a>                        u<span class="op">,</span></span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a>                        edge_index<span class="op">,</span></span>
+<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a>                    <span class="op">};</span></span>
+<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a>                <span class="op">}</span></span>
+<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span><span class="op">;</span></span>
+<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a>        <span class="at">const</span> <span class="dt">double</span> min_y <span class="op">=</span> <span class="bu">std::</span>min<span class="op">(</span>a<span class="op">.</span>y<span class="op">,</span> b<span class="op">.</span>y<span class="op">);</span></span>
+<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>        <span class="at">const</span> <span class="dt">double</span> max_y <span class="op">=</span> <span class="bu">std::</span>max<span class="op">(</span>a<span class="op">.</span>y<span class="op">,</span> b<span class="op">.</span>y<span class="op">);</span></span>
+<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Se a horizontal que passa por p0 nao atravessa o intervalo</span></span>
+<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>        <span class="co">// vertical do lado AB, esse lado nao pode ser intersectado.</span></span>
+<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a>        <span class="co">//</span></span>
+<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a>        <span class="co">// O intervalo e tratado de forma semiaberta para evitar que um</span></span>
+<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a>        <span class="co">// vertice compartilhado seja considerado duas vezes.</span></span>
+<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span></span>
+<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a>            point<span class="op">.</span>y <span class="op">&lt;=</span> min_y <span class="op">+</span> DEFAULT_TOLERANCE <span class="op">||</span></span>
+<span id="cb7-88"><a href="#cb7-88" aria-hidden="true" tabindex="-1"></a>            point<span class="op">.</span>y <span class="op">&gt;</span> max_y <span class="op">+</span> DEFAULT_TOLERANCE</span>
+<span id="cb7-89"><a href="#cb7-89" aria-hidden="true" tabindex="-1"></a>        <span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span><span class="op">;</span></span>
+<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Calcula a coordenada x da intersecao entre a horizontal</span></span>
+<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a>        <span class="co">// y = point.y e o segmento AB.</span></span>
+<span id="cb7-95"><a href="#cb7-95" aria-hidden="true" tabindex="-1"></a>        <span class="co">//</span></span>
+<span id="cb7-96"><a href="#cb7-96" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Parametrizando o lado pela coordenada y:</span></span>
+<span id="cb7-97"><a href="#cb7-97" aria-hidden="true" tabindex="-1"></a>        <span class="co">//</span></span>
+<span id="cb7-98"><a href="#cb7-98" aria-hidden="true" tabindex="-1"></a>        <span class="co">// x = a.x + (y - a.y) * (b.x - a.x) / (b.y - a.y)</span></span>
+<span id="cb7-99"><a href="#cb7-99" aria-hidden="true" tabindex="-1"></a>        <span class="at">const</span> <span class="dt">double</span> x <span class="op">=</span></span>
+<span id="cb7-100"><a href="#cb7-100" aria-hidden="true" tabindex="-1"></a>            a<span class="op">.</span>x <span class="op">+</span></span>
+<span id="cb7-101"><a href="#cb7-101" aria-hidden="true" tabindex="-1"></a>            <span class="op">(</span>point<span class="op">.</span>y <span class="op">-</span> a<span class="op">.</span>y<span class="op">)</span> <span class="op">*</span></span>
+<span id="cb7-102"><a href="#cb7-102" aria-hidden="true" tabindex="-1"></a>            <span class="op">(</span>b<span class="op">.</span>x <span class="op">-</span> a<span class="op">.</span>x<span class="op">)</span> <span class="op">/</span></span>
+<span id="cb7-103"><a href="#cb7-103" aria-hidden="true" tabindex="-1"></a>            <span class="op">(</span>b<span class="op">.</span>y <span class="op">-</span> a<span class="op">.</span>y<span class="op">);</span></span>
+<span id="cb7-104"><a href="#cb7-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-105"><a href="#cb7-105" aria-hidden="true" tabindex="-1"></a>        <span class="co">// A semirreta parte de p0 para a direita, portanto intersecoes</span></span>
+<span id="cb7-106"><a href="#cb7-106" aria-hidden="true" tabindex="-1"></a>        <span class="co">// localizadas a esquerda de p0 sao descartadas.</span></span>
+<span id="cb7-107"><a href="#cb7-107" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>x <span class="op">&lt;=</span> point<span class="op">.</span>x <span class="op">+</span> DEFAULT_TOLERANCE<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-108"><a href="#cb7-108" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span><span class="op">;</span></span>
+<span id="cb7-109"><a href="#cb7-109" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb7-110"><a href="#cb7-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-111"><a href="#cb7-111" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Como todas as intersecoes possuem y = point.y, basta comparar</span></span>
+<span id="cb7-112"><a href="#cb7-112" aria-hidden="true" tabindex="-1"></a>        <span class="co">// suas coordenadas x para obter aquela mais proxima de p0.</span></span>
+<span id="cb7-113"><a href="#cb7-113" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span></span>
+<span id="cb7-114"><a href="#cb7-114" aria-hidden="true" tabindex="-1"></a>            <span class="op">!</span>first_intersection <span class="op">||</span></span>
+<span id="cb7-115"><a href="#cb7-115" aria-hidden="true" tabindex="-1"></a>            x <span class="op">&lt;</span> first_intersection<span class="op">-&gt;</span>point<span class="op">.</span>x</span>
+<span id="cb7-116"><a href="#cb7-116" aria-hidden="true" tabindex="-1"></a>        <span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-117"><a href="#cb7-117" aria-hidden="true" tabindex="-1"></a>            first_intersection <span class="op">=</span> RayIntersection<span class="op">{</span></span>
+<span id="cb7-118"><a href="#cb7-118" aria-hidden="true" tabindex="-1"></a>                <span class="op">{</span>x<span class="op">,</span> point<span class="op">.</span>y<span class="op">},</span></span>
+<span id="cb7-119"><a href="#cb7-119" aria-hidden="true" tabindex="-1"></a>                i<span class="op">,</span></span>
+<span id="cb7-120"><a href="#cb7-120" aria-hidden="true" tabindex="-1"></a>            <span class="op">};</span></span>
+<span id="cb7-121"><a href="#cb7-121" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb7-122"><a href="#cb7-122" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb7-123"><a href="#cb7-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-124"><a href="#cb7-124" aria-hidden="true" tabindex="-1"></a>    <span class="co">// std::nullopt indica que a semirreta nao encontrou o poligono.</span></span>
+<span id="cb7-125"><a href="#cb7-125" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> first_intersection<span class="op">;</span></span>
+<span id="cb7-126"><a href="#cb7-126" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<!-- snippet-include-end -->
+</details>
+</body>
+</html>

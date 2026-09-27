@@ -1,0 +1,184 @@
+html {
+    background: #fff;
+    color: #20252b;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 18px;
+    -webkit-text-size-adjust: 100%;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 40px 60px;
+    line-height: 1.6;
+    overflow-wrap: break-word;
+}
+
+header {
+    margin-bottom: 2.5rem;
+    text-align: center;
+    border-bottom: 1px solid #d8d8d8;
+    padding-bottom: 1rem;
+}
+
+header p {
+    margin: 0.4rem 0;
+}
+
+h1, h2, h3, h4, summary {
+    font-family: "Segoe UI", Arial, sans-serif;
+    line-height: 1.35;
+}
+
+h1 {
+    font-size: 1.9rem;
+}
+
+h2 {
+    margin-top: 2.6rem;
+    border-bottom: 1px solid #d8d8d8;
+    padding-bottom: 0.35rem;
+    font-size: 1.5rem;
+}
+
+h3 {
+    margin-top: 1.8rem;
+    font-size: 1.15rem;
+}
+
+h4 {
+    margin-top: 1.4rem;
+    font-size: 1rem;
+}
+
+a {
+    color: #205c87;
+    text-underline-offset: 0.15em;
+}
+
+a:focus-visible, summary:focus-visible {
+    outline: 2px solid #205c87;
+    outline-offset: 4px;
+}
+
+iframe {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    border: 0;
+    margin: 1.5rem auto 0.5rem;
+}
+
+iframe + p {
+    margin-top: 0.5rem;
+    color: #454c54;
+    font-size: 0.9rem;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+table {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    margin: 1.2rem 0;
+    font-size: 0.95rem;
+}
+
+th, td {
+    padding: 0.5rem 0.8rem;
+    border-bottom: 1px solid #d8d8d8;
+    vertical-align: top;
+}
+
+th {
+    background: #f4f6f8;
+    text-align: left;
+}
+
+code {
+    font-family: Consolas, "Cascadia Code", monospace;
+    font-size: 0.88em;
+    overflow-wrap: anywhere;
+}
+
+pre {
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 1rem;
+    background: #f6f8fa;
+    border-radius: 4px;
+    line-height: 1.5;
+    tab-size: 4;
+}
+
+pre code {
+    white-space: pre;
+    overflow-wrap: normal;
+}
+
+div.sourceCode {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+details {
+    margin: 1rem 0 1.5rem;
+    border: 1px solid #d8d8d8;
+    border-radius: 6px;
+    padding: 0.7rem 1rem;
+}
+
+summary {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+details[open] summary {
+    margin-bottom: 0.8rem;
+}
+
+details pre {
+    margin-bottom: 0;
+}
+
+/* Keep long equations within the available page width. */
+.math.display {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.25rem 0;
+}
+
+@media (max-width: 700px) {
+    html {
+        font-size: 16px;
+    }
+
+    body {
+        padding: 24px 16px;
+    }
+
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+    }
+
+    details {
+        padding: 0.6rem 0.7rem;
+    }
+}
