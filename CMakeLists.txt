@@ -263,6 +263,8 @@ set(
     TCA_CPP_SOURCES
     cpp/src/core.cpp
     cpp/src/algorithms/sorting/registry.cpp
+    cpp/src/geometry/primitives.cpp
+    cpp/src/geometry/algorithms.cpp
     ${TCA_SORTING_SOURCES}
 )
 
@@ -305,6 +307,7 @@ set(
     cpp/bindings/prng.cpp
     cpp/bindings/quantization.cpp
     cpp/bindings/sorting.cpp
+    cpp/bindings/geometry.cpp
 )
 
 pybind11_add_module(
