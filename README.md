@@ -48,12 +48,21 @@ standalone; no parent repository is required to understand or use it.
 
 The reusable C++ and Python implementation surface has a standalone Doxygen
 reference. It deliberately covers library contracts rather than duplicating
-assignment narratives or generated course artifacts.
+assignment narratives or generated course artifacts. Doxygen is required and
+must be available on `PATH`; this workflow was validated with Doxygen 1.9.8.
+Verify the installation with:
 
 ```bash
-mkdir -p build/doxygen
-doxygen Doxyfile
+doxygen --version
 ```
 
-Open `build/doxygen/html/index.html`. See [the API reference entry point](docs/API_REFERENCE.md)
-for scope, C++/Python boundary contracts, and tool responsibilities.
+From the repository root, build the reference with:
+
+```bash
+mkdir -p build/doxygen && doxygen Doxyfile
+```
+
+Generated HTML is available at `build/doxygen/html/index.html`. Generated
+documentation remains under `build/` and is not versioned. See [the API
+reference entry point](docs/API_REFERENCE.md) for scope, C++/Python boundary
+contracts, and tool responsibilities.
