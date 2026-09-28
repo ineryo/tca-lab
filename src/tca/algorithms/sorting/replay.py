@@ -10,6 +10,7 @@ from ._trace import SortTraceResult
 
 @dataclass(slots=True)
 class SortingState:
+    """Mutable state reconstructed for a sorting trace frame."""
     values: np.ndarray
     metrics: Metrics = field(default_factory=Metrics)
     radix_base_values: list[object] | None = None
@@ -68,6 +69,7 @@ def sorting_reducer(
 def make_sorting_replay(
     result: SortTraceResult,
 ) -> Replay[SortingState, TraceEvent]:
+    """Build a random-access replay from a result created by ``trace_sort``."""
     initial_state = SortingState(
         values=result.initial_values.copy(),
     )

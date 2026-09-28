@@ -33,6 +33,7 @@ QUICK_PROFILES = {
 
 
 def available_sorting_algorithms() -> tuple[str, ...]:
+    """Return native/reference methods plus the named merge and quick profiles."""
     return (
         *_available_sorting_algorithms(),
         *MERGE_PROFILES,
@@ -48,6 +49,11 @@ def sort(
     metrics: Metrics | None = None,
     trace: Trace | None = None,
 ) -> None:
+    """Sort a one-dimensional NumPy array in place through the selected backend.
+
+    The ``cpp`` backend requires a C-contiguous ``float64`` array and does not
+    support ``trace``. Both backends accept an optional shared ``Metrics`` sink.
+    """
     if not isinstance(values, np.ndarray):
         raise TypeError("values must be a NumPy array")
 

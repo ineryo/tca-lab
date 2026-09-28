@@ -5,8 +5,10 @@
 namespace tca::geometry {
 
 // Practical comparison policy for double; this is not an exact-real model.
+/** Practical absolute tolerance for this floating-point geometry kernel. */
 inline constexpr double DEFAULT_TOLERANCE = 1e-12;
 
+/** Returns whether @p value is zero under the supplied absolute tolerance. */
 inline bool is_zero(double value, double tolerance = DEFAULT_TOLERANCE) {
     return std::abs(value) <= tolerance;
 }
@@ -16,6 +18,7 @@ inline bool almost_equal(double left, double right,
     return is_zero(left - right, tolerance);
 }
 
+/** Classifies @p value as -1, 0, or 1 under the supplied tolerance. */
 inline int sign(double value, double tolerance = DEFAULT_TOLERANCE) {
     if (is_zero(value, tolerance)) {
         return 0;

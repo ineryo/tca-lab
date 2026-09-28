@@ -18,6 +18,7 @@ class ReplayFrame[StateT, EventT]:
 
 
 class Replay[StateT, EventT]:
+    """Precomputes independent state frames for deterministic trace navigation."""
     def __init__(
         self,
         initial_state: StateT,

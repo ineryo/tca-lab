@@ -5,10 +5,16 @@
 
 namespace tca {
 
+/**
+ * Deterministic 64-bit pseudo-random number generator shared by C++ sorting
+ * strategies and their Python reference counterparts.
+ */
 class PRNG {
   public:
+    /** Constructs a generator in the state determined by @p seed. */
     explicit PRNG(std::uint64_t seed = 0) noexcept : state_(seed) {}
 
+    /** Advances the generator and returns the next unsigned 64-bit value. */
     std::uint64_t next_uint64() noexcept {
         state_ += 0x9E3779B97F4A7C15ULL;
 
@@ -20,6 +26,10 @@ class PRNG {
         return value;
     }
 
+    /**
+     * Returns a uniformly selected integer in `[0, upper_bound)`.
+     * @throws std::invalid_argument when @p upper_bound is zero.
+     */
     std::uint64_t randbelow(std::uint64_t upper_bound) {
         if (upper_bound == 0) {
             throw std::invalid_argument("upper_bound must be greater than zero");

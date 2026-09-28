@@ -9,6 +9,7 @@ from ._sort import sort
 
 @dataclass
 class SortTraceResult:
+    """Immutable record of a Python sorting run and its captured trace."""
     initial_values: np.ndarray
     final_values: np.ndarray
     metrics: Metrics
@@ -20,6 +21,7 @@ def trace_sort(
     *,
     method: str,
 ) -> SortTraceResult:
+    """Sort in place with the Python backend and return replay-ready evidence."""
     initial_values = values.copy()
     metrics = Metrics()
     trace = Trace()

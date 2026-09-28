@@ -43,3 +43,17 @@ Markdown, notebooks, source code, and renderer inputs remain canonical in their
 respective workflows. Rendered HTML, Plotly artifacts, and slides are intentional
 outputs linked from their assignment documentation. This repository remains fully
 standalone; no parent repository is required to understand or use it.
+
+### API/reference documentation
+
+The reusable C++ and Python implementation surface has a standalone Doxygen
+reference. It deliberately covers library contracts rather than duplicating
+assignment narratives or generated course artifacts.
+
+```bash
+mkdir -p build/doxygen
+doxygen Doxyfile
+```
+
+Open `build/doxygen/html/index.html`. See [the API reference entry point](docs/API_REFERENCE.md)
+for scope, C++/Python boundary contracts, and tool responsibilities.
