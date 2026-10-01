@@ -6,7 +6,10 @@
 #include <span>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
+#include "tca/algorithms/sorting/insertion_argsort.hpp"
+#include "tca/algorithms/sorting/merge_argsort.hpp"
 #include "tca/algorithms/sorting/merge_sort.hpp"
 #include "tca/algorithms/sorting/quick_sort.hpp"
 #include "tca/algorithms/sorting/radix_binary_sort.hpp"
@@ -172,6 +175,37 @@ void radix_binary_sort_array(Array values, py::object metrics) {
     accumulate_metrics(metrics, native_metrics);
 }
 
+py::array_t<std::size_t> index_array(const std::vector<std::size_t>& indices) {
+    py::array_t<std::size_t> result(indices.size());
+    auto output = result.mutable_unchecked<1>();
+
+    for (std::size_t index_i = 0; index_i < indices.size(); ++index_i) {
+        output(index_i) = indices[index_i];
+    }
+
+    return result;
+}
+
+std::span<const double> const_array_view(const Array& values) {
+    if (values.ndim() != 1) {
+        throw std::runtime_error("argsort expects a one-dimensional array");
+    }
+
+    return {values.data(), static_cast<std::size_t>(values.size())};
+}
+
+py::array_t<std::size_t> insertion_argsort_array(const Array& values) {
+    return index_array(tca::algorithms::insertion_argsort(const_array_view(values)));
+}
+
+py::array_t<std::size_t> merge_argsort_array(const Array& values) {
+    return index_array(tca::algorithms::merge_argsort(const_array_view(values)));
+}
+
+py::array_t<std::size_t> radix_binary_argsort_array(const Array& values) {
+    return index_array(tca::algorithms::radix_binary_argsort(const_array_view(values)));
+}
+
 } // namespace
 
 void bind_sorting(py::module_& m) {
@@ -190,6 +224,10 @@ void bind_sorting(py::module_& m) {
 
     m.def("radix_binary_sort", &radix_binary_sort_array, py::arg("values"),
           py::arg("metrics") = py::none());
+
+    m.def("insertion_argsort", &insertion_argsort_array, py::arg("values"));
+    m.def("merge_argsort", &merge_argsort_array, py::arg("values"));
+    m.def("radix_binary_argsort", &radix_binary_argsort_array, py::arg("values"));
 
     m.def("available_sorting_algorithms", []() {
         py::list result;

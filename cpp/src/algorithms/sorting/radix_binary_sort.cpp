@@ -38,7 +38,7 @@ std::size_t byte_at(std::uint64_t key, std::size_t pass) noexcept {
     return static_cast<std::size_t>((key >> shift) & 0xFFu); // byte(key, pass)
 }
 
-void validate_values(std::span<double> values) {
+void validate_values(std::span<const double> values) {
     for (const double value : values) {
         if (std::isnan(value)) {
             throw std::invalid_argument("radix_binary_sort does not support NaN");
@@ -86,6 +86,34 @@ void counting_sort_by_byte(std::span<double> source, std::span<double> destinati
     }
 }
 
+void counting_argsort_by_byte(std::span<const double> values,
+                              std::span<const std::size_t> source,
+                              std::span<std::size_t> destination, std::size_t pass) {
+    std::array<std::size_t, BYTE_VALUES> counts{}; // c[0..255] = 0
+
+    for (const std::size_t index_source : source) { // contagem dos índices
+        const std::uint64_t key = sortable_key(values[index_source]);
+        const std::size_t bucket = byte_at(key, pass);
+
+        ++counts[bucket];
+    }
+
+    std::array<std::size_t, BYTE_VALUES> offsets{}; // p[0..255]
+    std::size_t position = 0;
+
+    for (std::size_t bucket = 0; bucket < BYTE_VALUES; ++bucket) {
+        offsets[bucket] = position;
+        position += counts[bucket];
+    }
+
+    for (const std::size_t index_source : source) { // distribuição estável
+        const std::uint64_t key = sortable_key(values[index_source]);
+        const std::size_t bucket = byte_at(key, pass);
+
+        destination[offsets[bucket]++] = index_source;
+    }
+}
+
 template <typename ProbeType>
 void radix_binary_sort_impl(std::span<double> values, ProbeType& probe) {
     if (values.size() < 2) { // se n < 2 então retorne {caso básico}
@@ -128,6 +156,32 @@ void radix_binary_sort(std::span<double> values,
     tca::instrumentation::Probe probe(metrics);
 
     radix_binary_sort_impl(values, probe);
+}
+
+std::vector<std::size_t> radix_binary_argsort(std::span<const double> values) {
+    std::vector<std::size_t> indices(values.size());
+
+    for (std::size_t index_i = 0; index_i < values.size(); ++index_i) {
+        indices[index_i] = index_i;
+    }
+
+    if (values.size() < 2) {
+        return indices;
+    }
+
+    validate_values(values);
+
+    std::vector<std::size_t> buffer(values.size());
+    std::span<std::size_t> source{indices};
+    std::span<std::size_t> destination{buffer};
+
+    for (std::size_t pass = 0; pass < RADIX_PASSES; ++pass) {
+        counting_argsort_by_byte(values, source, destination, pass);
+        std::swap(source, destination);
+    }
+
+    // RADIX_PASSES is even for uint64_t, so the final pass writes to indices.
+    return indices;
 }
 
 } // namespace tca::algorithms

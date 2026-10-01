@@ -116,3 +116,57 @@ def test_sort_rejects_unknown_backend():
             method=METHODS[0],
             backend="cuda",
         )
+
+
+@pytest.mark.parametrize("method", ["insertion", "merge", "radix_binary"])
+def test_argsort_public_api_is_stable_and_does_not_modify_input(method):
+    from tca.algorithms.sorting import argsort
+
+    values = np.array([3.0, 1.0, 3.0, 1.0, 3.0], dtype=np.float64)
+    original = values.copy()
+
+    order = argsort(values, method=method)
+
+    np.testing.assert_array_equal(order, np.array([1, 3, 0, 2, 4]))
+    np.testing.assert_array_equal(values, original)
+
+
+@pytest.mark.parametrize("method", ["insertion", "merge", "radix_binary"])
+@pytest.mark.parametrize("size", [0, 1, 2, 10, 100])
+def test_argsort_public_api_matches_stable_numpy_sort(method, size):
+    from tca.algorithms.sorting import argsort
+
+    rng = np.random.default_rng(42)
+    values = rng.integers(-10, 11, size=size).astype(np.float64)
+
+    order = argsort(values, method=method)
+    expected = np.argsort(values, kind="stable")
+
+    np.testing.assert_array_equal(order, expected)
+
+
+def test_argsort_rejects_unknown_method():
+    from tca.algorithms.sorting import argsort
+
+    values = np.array([3.0, 2.0, 1.0], dtype=np.float64)
+
+    with pytest.raises(ValueError, match="unknown argsort method"):
+        argsort(values, method="quick")
+
+
+def test_argsort_rejects_python_backend():
+    from tca.algorithms.sorting import argsort
+
+    values = np.array([3.0, 2.0, 1.0], dtype=np.float64)
+
+    with pytest.raises(ValueError, match="only backend='cpp'"):
+        argsort(values, backend="python")
+
+
+def test_argsort_requires_float64():
+    from tca.algorithms.sorting import argsort
+
+    values = np.array([3.0, 2.0, 1.0], dtype=np.float32)
+
+    with pytest.raises(TypeError, match="dtype=np.float64"):
+        argsort(values)
